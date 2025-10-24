@@ -1,15 +1,43 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #a0522d;
+  --font-playfair: 'Playfair Display', Georgia, serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-playfair: var(--font-playfair);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +50,84 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Added custom styles for premium sushi site */
+.section-spacing {
+  @apply py-20 md:py-32;
+}
+
+.hero-text {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.subtitle-text {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+}
+
+/* Hero section animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 1.5s ease-out;
+}
+
+/* Flowing images animation */
+@keyframes scrollRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+@keyframes scrollLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-right {
+  animation: scrollRight 30s linear infinite;
+}
+
+.animate-scroll-left {
+  animation: scrollLeft 30s linear infinite;
+}
+
+.animate-scroll-left-fast {
+  animation: scrollLeft 20s linear infinite;
+}
+
+/* Infinite scroll animation for mobile */
+@keyframes infiniteScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-272px * 5));
+  }
+}
+
+.animate-infinite-scroll {
+  animation: infiniteScroll 15s linear infinite;
+  width: max-content;
 }
