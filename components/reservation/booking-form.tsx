@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BookingConfirmModal from './booking-confirm-modal';
+import { menuItems } from '@/constants/menu-items';
 
 interface BookingFormProps {
   selectedDate: string;
@@ -153,11 +154,13 @@ export default function BookingForm({
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
+              onChange={(e) => {
+                // 숫자만 허용
+                const numericValue = e.target.value.replace(/\D/g, '');
+                setFormData({ ...formData, phone: numericValue });
+              }}
               className="w-full bg-black/30 border border-gray-700 px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors"
-              placeholder="Enter your contact number"
+              placeholder="Enter numbers only (e.g., 4161234567)"
               required
             />
           </div>
@@ -273,15 +276,11 @@ export default function BookingForm({
               Menu Selection *
             </label>
             <div className="space-y-3">
-              {[
-                { value: 'Premium Omakase', price: '$180 per guest' },
-                { value: 'Classic Sushi Set', price: '$120 per guest' },
-                { value: 'Special Sashimi', price: '$150 per guest' },
-              ].map((menu) => (
+              {menuItems.map((menu) => (
                 <label
-                  key={menu.value}
+                  key={menu.id}
                   className={`block p-4 border cursor-pointer transition-all ${
-                    formData.menu === menu.value
+                    formData.menu === menu.title
                       ? 'border-primary bg-primary/10'
                       : 'border-gray-700 bg-black/20 hover:border-gray-600'
                   }`}
@@ -291,8 +290,8 @@ export default function BookingForm({
                       <input
                         type="radio"
                         name="menu"
-                        value={menu.value}
-                        checked={formData.menu === menu.value}
+                        value={menu.title}
+                        checked={formData.menu === menu.title}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
@@ -303,7 +302,7 @@ export default function BookingForm({
                         required
                       />
                       <span className="text-white font-light">
-                        {menu.value}
+                        {menu.title}
                       </span>
                     </div>
                     <span className="text-primary font-light">

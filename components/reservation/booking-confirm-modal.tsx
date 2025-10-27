@@ -104,7 +104,7 @@ export default function BookingConfirmModal({
               </li>
               <li>
                 • A detailed quote and preparation guidelines will be sent to
-                the provided email address.
+                your email address.
               </li>
             </ul>
           </div>

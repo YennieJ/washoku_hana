@@ -25,9 +25,9 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #a0522d;
+  --background: #171717;
+  --foreground: #ededed;
+  --primary: #e58246;
   --font-playfair: 'Playfair Display', Georgia, serif;
 }
 
@@ -38,13 +38,6 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-playfair: var(--font-playfair);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
