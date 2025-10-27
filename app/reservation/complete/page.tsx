@@ -1,38 +1,40 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/navigation';
 import Footer from '@/components/footer';
 
+interface BookingData {
+  bookingId: string;
+}
+
 export default function ReservationCompletePage() {
   const router = useRouter();
-  const [bookingData, setBookingData] = useState<any>(null);
 
-  // 나중에 활용할 코드들 (주석 처리)
-  // const [isValidAccess, setIsValidAccess] = useState(false);
-  // const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // 임시 예약 ID 생성해서 표시
+  // 임시 예약 ID를 useState 초기값으로 생성
+  const [bookingData] = useState<BookingData>(() => {
     const tempBookingId = `BK${Date.now()}${Math.random()
       .toString(36)
       .substring(2, 5)
       .toUpperCase()}`;
+    return { bookingId: tempBookingId };
+  });
 
-    setBookingData({ bookingId: tempBookingId });
-
-    // 나중에 활용할 sessionStorage 체크 로직 (주석 처리)
-    // const bookingId = sessionStorage.getItem('bookingId');
-    // if (!bookingId) {
-    //   router.push('/reservation');
-    //   return;
-    // }
-    // setBookingData({ bookingId });
-    // setIsValidAccess(true);
-    // setIsLoading(false);
-    // sessionStorage.removeItem('bookingId');
-  }, []);
+  // 나중에 활용할 코드들 (주석 처리)
+  // const [isValidAccess, setIsValidAccess] = useState(false);
+  // const [isLoading, setIsLoading] = useState(true);
+  // useEffect(() => {
+  //   const bookingId = sessionStorage.getItem('bookingId');
+  //   if (!bookingId) {
+  //     router.push('/reservation');
+  //     return;
+  //   }
+  //   setBookingData({ bookingId });
+  //   setIsValidAccess(true);
+  //   setIsLoading(false);
+  //   sessionStorage.removeItem('bookingId');
+  // }, [router]);
 
   return (
     <div className="min-h-screen text-white">
@@ -109,7 +111,7 @@ export default function ReservationCompletePage() {
             <div className="bg-gray-800/50 rounded-lg p-4 mt-4">
               <p className="text-sm text-gray-400 mb-1">예약번호</p>
               <p className="text-primary font-mono text-lg">
-                {bookingData?.bookingId}
+                {bookingData.bookingId}
               </p>
             </div>
             <p className="text-sm text-gray-400 font-light mt-3">
@@ -125,7 +127,7 @@ export default function ReservationCompletePage() {
             <div className="flex items-start space-x-3">
               <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
               <p className="text-gray-300 font-light flex-1">
-                If you don't see the email, please check your{' '}
+                If you don&apos;t see the email, please check your{' '}
                 <span className="text-white font-medium">spam folder</span>.
               </p>
             </div>

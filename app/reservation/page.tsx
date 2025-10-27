@@ -9,11 +9,7 @@ import Footer from '@/components/footer';
 export default function ReservationPage() {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDayName, setSelectedDayName] = useState('');
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const isClient = true; // 클라이언트 컴포넌트에서는 항상 true
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {

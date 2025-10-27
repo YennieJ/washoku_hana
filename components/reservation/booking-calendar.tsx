@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface BookingCalendarProps {
   onDateSelect: (date: string, dayName: string) => void;
@@ -11,53 +11,46 @@ export default function BookingCalendar({
   onDateSelect,
   selectedDate,
 }: BookingCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState<Date | null>(null);
-  const [today, setToday] = useState<Date | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  // Toronto timezone (America/Toronto) - accurate timezone conversion
+  const now = new Date();
+  const torontoFormatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Toronto',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+  const torontoParts = torontoFormatter.formatToParts(now);
+  const torontoDate = new Date(
+    parseInt(torontoParts.find((p) => p.type === 'year')!.value),
+    parseInt(torontoParts.find((p) => p.type === 'month')!.value) - 1,
+    parseInt(torontoParts.find((p) => p.type === 'day')!.value),
+    parseInt(torontoParts.find((p) => p.type === 'hour')!.value),
+    parseInt(torontoParts.find((p) => p.type === 'minute')!.value),
+    parseInt(torontoParts.find((p) => p.type === 'second')!.value)
+  );
 
-  useEffect(() => {
-    // Toronto timezone (America/Toronto) - accurate timezone conversion
-    const now = new Date();
-
-    // Extract date info for Toronto timezone using Intl.DateTimeFormat
-    const torontoFormatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'America/Toronto',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
-
-    const torontoParts = torontoFormatter.formatToParts(now);
-    const torontoDate = new Date(
-      parseInt(torontoParts.find((p) => p.type === 'year')!.value),
-      parseInt(torontoParts.find((p) => p.type === 'month')!.value) - 1,
-      parseInt(torontoParts.find((p) => p.type === 'day')!.value),
-      parseInt(torontoParts.find((p) => p.type === 'hour')!.value),
-      parseInt(torontoParts.find((p) => p.type === 'minute')!.value),
-      parseInt(torontoParts.find((p) => p.type === 'second')!.value)
-    );
-
-    setCurrentMonth(torontoDate);
-    setToday(torontoDate);
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return (
-      <div className="bg-white/5 border border-primary/20 p-4 h-96 flex items-center justify-center backdrop-blur-sm rounded-lg">
-        <div className="text-gray-400 font-light">Loading calendar...</div>
-      </div>
-    );
-  }
-
-  if (!currentMonth || !today) return null;
+  const [currentMonth, setCurrentMonth] = useState<Date>(torontoDate);
+  const [today] = useState<Date>(torontoDate);
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth();
+
+  // 이전 달 계산
+  const prevMonthDate = new Date(year, month - 1);
+  const prevMonthYear = prevMonthDate.getFullYear();
+  const prevMonthValue = prevMonthDate.getMonth();
+
+  // 이전 달이 오늘보다 과거면 이동 불가
+  const canGoToPreviousMonth = !(
+    prevMonthYear < todayYear ||
+    (prevMonthYear === todayYear && prevMonthValue < todayMonth)
+  );
 
   // Get first day of month and number of days
   const firstDay = new Date(year, month, 1).getDay();
@@ -135,7 +128,12 @@ export default function BookingCalendar({
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => setCurrentMonth(new Date(year, month - 1))}
-          className="text-primary cursor-pointer hover:text-primary/80 p-2 transition-colors"
+          disabled={!canGoToPreviousMonth}
+          className={`p-2 transition-colors ${
+            !canGoToPreviousMonth
+              ? 'text-gray-600 cursor-not-allowed'
+              : 'text-primary cursor-pointer hover:text-primary/80'
+          }`}
         >
           ←
         </button>

@@ -63,7 +63,7 @@ export default function FAQSection() {
               <p className="text-gray-400 text-lg">No results found.</p>
             </div>
           ) : (
-            filteredItems.map((faq, index) => {
+            filteredItems.map((faq) => {
               const originalIndex = faq.originalIndex;
               return (
                 <div
