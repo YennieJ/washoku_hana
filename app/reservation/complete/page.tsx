@@ -109,7 +109,7 @@ export default function ReservationCompletePage() {
               A confirmation email has been sent to the address you provided.
             </p>
             <div className="bg-gray-800/50 rounded-lg p-4 mt-4">
-              <p className="text-sm text-gray-400 mb-1">예약번호</p>
+              <p className="text-sm text-gray-400 mb-1">Reservation Number</p>
               <p className="text-primary font-mono text-lg">
                 {bookingData.bookingId}
               </p>
