@@ -53,6 +53,7 @@ export default function SendEmailPage({ params }: PageProps) {
     ReservationStatus | 'CUSTOM'
   >('AWAITING_DEPOSIT');
   const mailTypeDropdownRef = useRef<HTMLDivElement>(null);
+  const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 금액 입력 필드 상태
   const [courseAmount, setCourseAmount] = useState('');
@@ -73,6 +74,11 @@ export default function SendEmailPage({ params }: PageProps) {
 
   // DECLINED용 입력 필드 상태
   const [declineReason, setDeclineReason] = useState('');
+
+  // CANCELLED용 취소 타입 상태 (기본값: 고객 취소)
+  const [cancellationType, setCancellationType] = useState<
+    'admin' | 'customer'
+  >('customer');
 
   // booking 로드 시 날짜 및 환불 금액 초기화
   useEffect(() => {
@@ -194,6 +200,8 @@ export default function SendEmailPage({ params }: PageProps) {
       reason: reason || '',
       changeProposal: changeProposal || '',
       declineReason: declineReason || '',
+      cancellationType:
+        selectedMailType === 'CANCELLED' ? cancellationType : undefined,
     };
 
     const template = getEmailTemplate(
@@ -209,6 +217,7 @@ export default function SendEmailPage({ params }: PageProps) {
     booking?.total_amount,
     booking?.deposit_amount,
     reservationDate,
+    cancellationType,
   ]);
 
   // 금액과 시간이 변경될 때 content 자동 업데이트 (예약금 안내, 예약 확정, 예약 취소, 예약 변경, 또는 예약 거절 템플릿일 때만)
@@ -250,6 +259,8 @@ export default function SendEmailPage({ params }: PageProps) {
       reason,
       changeProposal,
       declineReason,
+      cancellationType:
+        selectedMailType === 'CANCELLED' ? cancellationType : undefined,
     };
 
     // functional update로 최신 content를 기반으로 업데이트
@@ -277,7 +288,15 @@ export default function SendEmailPage({ params }: PageProps) {
     reason,
     changeProposal,
     declineReason,
+    cancellationType,
   ]);
+
+  // 취소 타입 변경 시 메일 편집 영역 스크롤을 최상단으로 이동
+  useEffect(() => {
+    if (selectedMailType === 'CANCELLED' && contentTextareaRef.current) {
+      contentTextareaRef.current.scrollTop = 0;
+    }
+  }, [cancellationType, selectedMailType]);
 
   // 텍스트를 HTML로 변환하는 함수
   const convertToHtml = (text: string): string => {
@@ -695,6 +714,8 @@ export default function SendEmailPage({ params }: PageProps) {
               formatTime,
               refundAmount,
               onRefundAmountChange: setRefundAmount,
+              cancellationType,
+              onCancellationTypeChange: setCancellationType,
               reason,
               changeProposal,
               onReasonChange: setReason,
@@ -731,6 +752,7 @@ export default function SendEmailPage({ params }: PageProps) {
                     </span>
                   </label>
                   <textarea
+                    ref={contentTextareaRef}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     className="w-full flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 resize-none font-mono text-sm overflow-y-auto"

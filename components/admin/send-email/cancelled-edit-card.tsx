@@ -1,17 +1,54 @@
 interface CancelledEditCardProps {
   refundAmount: string;
   onRefundAmountChange: (value: string) => void;
+  cancellationType: 'admin' | 'customer';
+  onCancellationTypeChange: (value: 'admin' | 'customer') => void;
 }
 
 export default function CancelledEditCard({
   refundAmount,
   onRefundAmountChange,
+  cancellationType,
+  onCancellationTypeChange,
 }: CancelledEditCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">메일 수정</h2>
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">환불 정보</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">취소 정보</h3>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            취소 주체
+          </label>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => onCancellationTypeChange('admin')}
+              className={`flex-1 px-4 py-2 rounded-md text-sm border transition-colors ${
+                cancellationType === 'admin'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              관리자 취소
+            </button>
+            <button
+              type="button"
+              onClick={() => onCancellationTypeChange('customer')}
+              className={`flex-1 px-4 py-2 rounded-md text-sm border transition-colors ${
+                cancellationType === 'customer'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              고객 취소
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            취소 주체에 따라 메일 내용이 달라집니다.
+          </p>
+        </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-900 mb-2">
             환불 금액 ($)

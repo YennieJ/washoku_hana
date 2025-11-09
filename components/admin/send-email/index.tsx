@@ -25,6 +25,8 @@ export interface EditCardProps {
   // CANCELLED
   refundAmount?: string;
   onRefundAmountChange?: (value: string) => void;
+  cancellationType?: 'admin' | 'customer';
+  onCancellationTypeChange?: (value: 'admin' | 'customer') => void;
 
   // PENDING_UPDATE
   reason?: string;
@@ -83,13 +85,20 @@ export function getEditCard(
       );
 
     case 'CANCELLED':
-      if (props.refundAmount === undefined || !props.onRefundAmountChange) {
+      if (
+        props.refundAmount === undefined ||
+        !props.onRefundAmountChange ||
+        props.cancellationType === undefined ||
+        !props.onCancellationTypeChange
+      ) {
         return null;
       }
       return (
         <CancelledEditCard
           refundAmount={props.refundAmount}
           onRefundAmountChange={props.onRefundAmountChange}
+          cancellationType={props.cancellationType}
+          onCancellationTypeChange={props.onCancellationTypeChange}
         />
       );
 
