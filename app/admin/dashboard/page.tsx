@@ -5,8 +5,14 @@ import { useMarkAsRead } from '@/hooks/useMarkAsRead';
 import type { Booking } from '@/lib/supabase';
 import { type PeriodType, DEFAULT_PERIOD } from '@/constants/period-filters';
 import { type ReadType, DEFAULT_READ_FILTER } from '@/constants/read-filters';
+import {
+  type StatusFilterType,
+  DEFAULT_STATUS_FILTER,
+} from '@/constants/status-filters';
+import { type ReservationStatus } from '@/constants/reservation-statuses';
 import PeriodFilter from '@/components/admin/period-filter';
 import ReadFilter from '@/components/admin/read-filter';
+import StatusFilter from '@/components/admin/status-filter';
 import SearchInput from '@/components/admin/search-input';
 import BookingTable from '@/components/admin/booking-table';
 import BookingDetailModal from '@/components/admin/booking-detail-modal';
@@ -14,6 +20,9 @@ import BookingDetailModal from '@/components/admin/booking-detail-modal';
 export default function AdminDashboard() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [readFilter, setReadFilter] = useState<ReadType>(DEFAULT_READ_FILTER);
+  const [statusFilter, setStatusFilter] = useState<StatusFilterType>(
+    DEFAULT_STATUS_FILTER
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const markAsReadMutation = useMarkAsRead();
@@ -45,13 +54,25 @@ export default function AdminDashboard() {
     debouncedSearch,
   });
 
-  // 클라이언트 사이드 필터링: 읽음/안읽음만 처리 (검색/기간은 API에서 처리됨)
+  // 상태별 카운트 계산
+  const statusCounts = bookings.reduce((acc, booking) => {
+    acc[booking.status] = (acc[booking.status] || 0) + 1;
+    return acc;
+  }, {} as Record<ReservationStatus, number>);
+
+  // 클라이언트 사이드 필터링: 읽음/안읽음 + 상태 필터 (검색/기간은 API에서 처리됨)
   const filteredBookings = bookings.filter((booking) => {
-    return (
+    // 읽음 필터 체크
+    const readMatch =
       readFilter === 'all' ||
       (readFilter === 'read' && booking.is_read) ||
-      (readFilter === 'unread' && !booking.is_read)
-    );
+      (readFilter === 'unread' && !booking.is_read);
+
+    // 상태 필터 체크
+    const statusMatch =
+      statusFilter === 'all' || booking.status === statusFilter;
+
+    return readMatch && statusMatch;
   });
 
   const totalCount = bookings.length;
@@ -94,8 +115,8 @@ export default function AdminDashboard() {
 
           {/* 필터 영역 (컴팩트) */}
           <div className="mb-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            {/* 왼쪽: 기간 + 읽음 상태 */}
-            <div className="flex items-center gap-3">
+            {/* 왼쪽: 기간 + 읽음 상태 + 상태 필터 */}
+            <div className="flex items-center gap-3 flex-wrap">
               <PeriodFilter
                 period={period}
                 setPeriod={setPeriod}
@@ -113,6 +134,12 @@ export default function AdminDashboard() {
                 setReadFilter={setReadFilter}
                 totalCount={totalCount}
                 unreadCount={unreadCount}
+              />
+
+              {/* 상태 필터 */}
+              <StatusFilter
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
               />
             </div>
 
