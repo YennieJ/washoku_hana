@@ -1,40 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/navigation';
 import Footer from '@/components/footer';
 
-interface BookingData {
-  bookingId: string;
-}
-
 export default function ReservationCompletePage() {
   const router = useRouter();
+  const [bookingNumber, setBookingNumber] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const hasInitialized = useRef(false);
 
-  // 임시 예약 ID를 useState 초기값으로 생성
-  const [bookingData] = useState<BookingData>(() => {
-    const tempBookingId = `BK${Date.now()}${Math.random()
-      .toString(36)
-      .substring(2, 5)
-      .toUpperCase()}`;
-    return { bookingId: tempBookingId };
-  });
+  useEffect(() => {
+    // 이미 초기화되었으면 재실행 방지 (Strict Mode 대응)
+    if (hasInitialized.current) {
+      return;
+    }
 
-  // 나중에 활용할 코드들 (주석 처리)
-  // const [isValidAccess, setIsValidAccess] = useState(false);
-  // const [isLoading, setIsLoading] = useState(true);
-  // useEffect(() => {
-  //   const bookingId = sessionStorage.getItem('bookingId');
-  //   if (!bookingId) {
-  //     router.push('/reservation');
-  //     return;
-  //   }
-  //   setBookingData({ bookingId });
-  //   setIsValidAccess(true);
-  //   setIsLoading(false);
-  //   sessionStorage.removeItem('bookingId');
-  // }, [router]);
+    const storedBookingNumber = sessionStorage.getItem('bookingNumber');
+
+    if (!storedBookingNumber) {
+      router.push('/reservation');
+      return;
+    }
+
+    setBookingNumber(storedBookingNumber);
+    setIsLoading(false);
+    hasInitialized.current = true;
+
+    // sessionStorage는 즉시 삭제 (state에 이미 저장됨)
+    sessionStorage.removeItem('bookingNumber');
+  }, [router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen text-white flex items-center justify-center">
+        <div className="text-primary">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!bookingNumber) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen text-white">
@@ -110,9 +118,7 @@ export default function ReservationCompletePage() {
             </p>
             <div className="bg-gray-800/50 rounded-lg p-4 mt-4">
               <p className="text-sm text-gray-400 mb-1">Reservation Number</p>
-              <p className="text-primary font-mono text-lg">
-                {bookingData.bookingId}
-              </p>
+              <p className="text-primary font-mono text-lg">{bookingNumber}</p>
             </div>
             <p className="text-sm text-gray-400 font-light mt-3">
               It includes the total amount, deposit details, preparation notes,

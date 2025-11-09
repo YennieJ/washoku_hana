@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface BookingCalendarProps {
   onDateSelect: (date: string, dayName: string) => void;
@@ -11,6 +11,27 @@ export default function BookingCalendar({
   onDateSelect,
   selectedDate,
 }: BookingCalendarProps) {
+  // 예약 불가능한 날짜 목록
+  const [unavailableDates, setUnavailableDates] = useState<Set<string>>(
+    new Set()
+  );
+
+  // 예약 불가능한 날짜 조회
+  useEffect(() => {
+    const fetchUnavailableDates = async () => {
+      try {
+        const response = await fetch('/api/bookings/available-dates');
+        if (response.ok) {
+          const data = await response.json();
+          setUnavailableDates(new Set(data.unavailableDates || []));
+        }
+      } catch (error) {
+        console.error('예약 불가능한 날짜 조회 실패:', error);
+      }
+    };
+
+    fetchUnavailableDates();
+  }, []);
   // Toronto timezone (America/Toronto) - accurate timezone conversion
   const now = new Date();
   const torontoFormatter = new Intl.DateTimeFormat('en-CA', {
@@ -91,8 +112,15 @@ export default function BookingCalendar({
     return selectedDate === dateStr;
   };
 
+  const isUnavailable = (day: number) => {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(
+      day
+    ).padStart(2, '0')}`;
+    return unavailableDates.has(dateStr);
+  };
+
   const handleDateClick = (day: number) => {
-    if (isPastDate(day) || !isWeekend(day)) return;
+    if (isPastDate(day) || !isWeekend(day) || isUnavailable(day)) return;
 
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(
       day
@@ -169,27 +197,37 @@ export default function BookingCalendar({
 
           const isWeekendDay = isWeekend(day);
           const isPastDay = isPastDate(day);
+          const isUnavailableDay = isUnavailable(day);
           const isSelectedDay = isSelected(day);
 
           return (
-            <button
-              key={index}
-              onClick={() => handleDateClick(day)}
-              disabled={isPastDay || !isWeekendDay}
-              className={`
-                h-12 text-sm border transition-all duration-300 rounded font-light
-                ${
-                  isPastDay
-                    ? 'text-gray-600 cursor-not-allowed bg-black/20 border-gray-800'
-                    : isWeekendDay
-                    ? 'text-primary border-primary/30 hover:bg-primary hover:text-white cursor-pointer hover:border-primary'
-                    : 'text-gray-600 cursor-not-allowed bg-black/20 border-gray-800'
-                }
-                ${isSelectedDay ? 'bg-primary text-white border-primary' : ''}
-              `}
-            >
-              {day}
-            </button>
+            <div key={index} className="relative group">
+              <button
+                onClick={() => handleDateClick(day)}
+                disabled={isPastDay || !isWeekendDay || isUnavailableDay}
+                className={`
+                  h-12 w-full text-sm border transition-all duration-300 rounded font-light
+                  ${
+                    isUnavailableDay
+                      ? 'text-gray-500 cursor-not-allowed bg-red-900/20 border-red-800/30 line-through'
+                      : isPastDay
+                      ? 'text-gray-600 cursor-not-allowed bg-black/20 border-gray-800'
+                      : isWeekendDay
+                      ? 'text-primary border-primary/30 hover:bg-primary hover:text-white cursor-pointer hover:border-primary'
+                      : 'text-gray-600 cursor-not-allowed bg-black/20 border-gray-800'
+                  }
+                  ${isSelectedDay ? 'bg-primary text-white border-primary' : ''}
+                `}
+              >
+                {day}
+              </button>
+              {isUnavailableDay && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  This date is already booked
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

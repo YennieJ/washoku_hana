@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Navigation from '@/components/navigation';
 import BookingCalendar from '@/components/reservation/booking-calendar';
 import BookingForm from '@/components/reservation/booking-form';
@@ -9,6 +9,7 @@ import Footer from '@/components/footer';
 export default function ReservationPage() {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDayName, setSelectedDayName] = useState('');
+  const bookingFormRef = useRef<HTMLElement>(null);
   const isClient = true; // 클라이언트 컴포넌트에서는 항상 true
 
   useEffect(() => {
@@ -51,6 +52,18 @@ export default function ReservationPage() {
     setSelectedDate(date);
     setSelectedDayName(dayName);
   };
+
+  // 날짜 선택 시 BookingForm 영역으로 자동 스크롤
+  useEffect(() => {
+    if (selectedDate && bookingFormRef.current) {
+      setTimeout(() => {
+        bookingFormRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 100);
+    }
+  }, [selectedDate]);
 
   if (!isClient) {
     return (
@@ -140,7 +153,7 @@ export default function ReservationPage() {
 
         {/* 2. Reservation Form */}
         {selectedDate ? (
-          <section className="relative pt-8  lg:pb-24">
+          <section ref={bookingFormRef} className="relative pt-8  lg:pb-24">
             <div className="max-w-2xl mx-auto">
               <BookingForm
                 selectedDate={selectedDate}

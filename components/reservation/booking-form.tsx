@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BookingConfirmModal from './booking-confirm-modal';
 import { menuItems } from '@/constants/menu-items';
+import { useCreateBooking } from '@/hooks/useCreateBooking';
+import { useSendBookingConfirmationEmail } from '@/hooks/useSendBookingConfirmationEmail';
+import { useSendAdminEmail } from '@/hooks/useSendAdminEmail';
 
 interface BookingFormProps {
   selectedDate: string;
@@ -13,7 +16,9 @@ export default function BookingForm({
   selectedDayName,
 }: BookingFormProps) {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const bookingMutation = useCreateBooking();
+  const customerEmailMutation = useSendBookingConfirmationEmail();
+  const adminEmailMutation = useSendAdminEmail();
   const [isGuestTypeOpen, setIsGuestTypeOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
@@ -58,43 +63,100 @@ export default function BookingForm({
     setShowConfirmModal(true);
   };
 
-  const handleConfirmBooking = async () => {
-    setIsSubmitting(true);
+  const handleConfirmBooking = () => {
+    const bookingDateTime = `${selectedDate}T19:00:00`;
 
-    try {
-      // API call - 현재 사용하지 않음
-      // const response = await fetch('/api/create-booking', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     ...formData,
-      //     selectedDate,
-      //     selectedDayName,
-      //   }),
-      // });
+    bookingMutation.mutate(
+      {
+        customer_name: formData.name,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
+        booking_date: bookingDateTime,
+        guest_count: Number(formData.guestCount),
+        menu: formData.menu,
+        address: formData.address,
+        food_allergy: formData.foodAllergy || '없음',
+        special_requests: formData.requests || null,
+      },
+      {
+        onSuccess: async (result) => {
+          // sessionStorage에 예약 번호 저장 (예약 성공 직후 1회만)
+          sessionStorage.setItem('bookingNumber', result.data.booking_number);
 
-      // if (!response.ok) {
-      //   throw new Error('Failed to submit your booking.');
-      // }
+          const errors: string[] = [];
 
-      // const result = await response.json();
+          try {
+            // 예약 성공 후 관리자에게 이메일 전송
+            try {
+              await adminEmailMutation.mutateAsync({
+                formData,
+                selectedDate,
+                selectedDayName,
+              });
+            } catch (adminError) {
+              const adminErrorMessage =
+                adminError instanceof Error
+                  ? adminError.message
+                  : String(adminError);
+              errors.push(`관리자 이메일: ${adminErrorMessage}`);
+            }
 
-      // sessionStorage에 예약 ID만 저장
-      // sessionStorage.setItem('bookingId', result.bookingId);
+            // 고객에게 이메일 전송
+            try {
+              await customerEmailMutation.mutateAsync({
+                formData,
+                selectedDate,
+                selectedDayName,
+                bookingNumber: result.data.booking_number,
+              });
+            } catch (customerError) {
+              const customerErrorMessage =
+                customerError instanceof Error
+                  ? customerError.message
+                  : String(customerError);
+              errors.push(`고객 이메일: ${customerErrorMessage}`);
+            }
 
-      // 완료 페이지로 이동
-      router.push('/reservation/complete');
-    } catch (error) {
-      console.error('Booking error:', error);
-      alert(
-        'An error occurred while submitting your booking. Please try again.'
-      );
-      setShowConfirmModal(false);
-    } finally {
-      setIsSubmitting(false);
-    }
+            // 이메일 전송 결과 확인
+            if (errors.length > 0) {
+              alert(
+                '예약은 성공적으로 완료되었으나, 일부 이메일 전송에 실패했습니다.\n\n' +
+                  '실패한 이메일:\n' +
+                  errors.join('\n') +
+                  '\n\n예약 번호: ' +
+                  result.data.booking_number +
+                  '\n\n고객센터로 문의해주세요.'
+              );
+            }
+
+            // 완료 페이지로 이동
+            router.push('/reservation/complete');
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+
+            alert(
+              '예약은 성공적으로 완료되었으나, 이메일 전송 중 오류가 발생했습니다.\n\n' +
+                '오류: ' +
+                errorMessage +
+                '\n\n예약 번호: ' +
+                result.data.booking_number +
+                '\n\n고객센터로 문의해주세요.'
+            );
+            // 완료 페이지로 이동
+            router.push('/reservation/complete');
+          }
+        },
+        onError: (error) => {
+          alert(
+            error instanceof Error
+              ? error.message
+              : 'An error occurred while submitting your booking. Please try again.'
+          );
+          setShowConfirmModal(false);
+        },
+      }
+    );
   };
 
   return (
@@ -106,7 +168,7 @@ export default function BookingForm({
           selectedDayName={selectedDayName}
           formData={formData}
           setShowConfirmModal={setShowConfirmModal}
-          isSubmitting={isSubmitting}
+          isSubmitting={bookingMutation.isPending}
           handleConfirmBooking={handleConfirmBooking}
         />
       )}
@@ -377,11 +439,11 @@ export default function BookingForm({
           <button
             type="submit"
             className={`w-full py-4 transition-colors font-light text-lg tracking-wide ${
-              isSubmitting || !privacyConsent
+              bookingMutation.isPending || !privacyConsent
                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 : 'bg-primary text-white hover:bg-primary/90 cursor-pointer'
             }`}
-            disabled={isSubmitting || !privacyConsent}
+            disabled={bookingMutation.isPending || !privacyConsent}
           >
             Next
           </button>
