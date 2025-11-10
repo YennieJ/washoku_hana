@@ -1,6 +1,8 @@
 import type { EmailTemplate, EmailTemplateData } from '@/types/email-templates';
-import { formatBookingInfoSection } from '@/utils/email-utils';
-import { ADMIN_EMAIL } from '@/constants/email';
+import {
+  formatBookingInfoSection,
+  getEmailSignature,
+} from '@/utils/email-utils';
 
 export function createPendingUpdateTemplate(
   data: EmailTemplateData
@@ -24,26 +26,18 @@ export function createPendingUpdateTemplate(
 
 Washoku Hana를 예약해 주셔서 다시 한번 감사드립니다.
 다가오는 예약과 관련하여, 일정상 소폭 조정이 필요한 부분이 있어 확인차 연락드립니다.
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 현재 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 **${사유}**으로 인해 아래와 같이 변경이 가능한지 확인 부탁드립니다.
 
 👉 **${변경제안}**
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 변경이 가능하신지 24시간 내로 회신 부탁드리며,
 어려우시다면 고객님의 일정에 맞는 다른 대안을 함께 찾아보겠습니다.
 
-감사합니다.
-
-이메일: ${ADMIN_EMAIL}
-
-Chef Minho
-Washoku Hana – Private Omakase Experience`;
+${getEmailSignature()}`;
 
   const subject = `Washoku Hana 예약 조정 확인 요청`;
 

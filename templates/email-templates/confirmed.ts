@@ -1,6 +1,9 @@
 import type { EmailTemplate, EmailTemplateData } from '@/types/email-templates';
-import { formatBookingInfoSection, formatTime } from '@/utils/email-utils';
-import { ADMIN_EMAIL } from '@/constants/email';
+import {
+  formatBookingInfoSection,
+  formatTime,
+  getEmailSignature,
+} from '@/utils/email-utils';
 
 export function createConfirmedTemplate(
   data: EmailTemplateData
@@ -60,35 +63,22 @@ export function createConfirmedTemplate(
 
 Washoku Hana의 예약이 확정되었습니다.
 소중한 자리에 저희를 초대해 주셔서 감사드리며, 잊지 못할 오마카세 경험을 준비하겠습니다.
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 금액 안내:
-
 총 금액: $${총금액}
 보증금 입금 확인: $${보증금}
-잔금: $${잔금}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-서비스 준비 및 셰프 도착 시간:
+잔금: $${잔금} (잔금 결제는 서비스 당일, 셰프 도착 후 현장에서 **현금 또는 계좌이체**로 가능합니다.)
 
 셰프 도착 시간: ${chefArrivalTime}
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 취소 및 환불 정책:
-
 행사 7일 전까지 취소: 보증금 100% 환불
 행사 3일 전까지 취소: 보증금 50% 환불
 행사 3일 이내 또는 당일 취소: 환불 불가
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 호스트가 준비하실 것:
-
 원활한 서비스 진행을 위해 아래 항목을 미리 준비해 주세요.
 
 **[필수 항목]**
@@ -100,17 +90,11 @@ ${bookingInfoSection}
 테이블 세팅 또는 식기류
 
 오마카세 진행에 필요한 모든 조리도구 및 플레이팅 장비는 셰프가 직접 준비합니다.
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 곧 고객님과 게스트분들께 잊지 못할 오마카세 경험을 선사하겠습니다.
 
-감사합니다.
-
-이메일: ${ADMIN_EMAIL}
-
-Chef Minho
-Washoku Hana – Private Omakase Experience`;
+${getEmailSignature()}`;
 
   const subject = `Washoku Hana 예약 확정 안내 – ${formattedDate} (${dayName}) ${시간}`;
 

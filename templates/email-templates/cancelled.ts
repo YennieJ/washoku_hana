@@ -1,5 +1,9 @@
 import type { EmailTemplate, EmailTemplateData } from '@/types/email-templates';
-import { formatBookingInfoSection, formatTime } from '@/utils/email-utils';
+import {
+  formatBookingInfoSection,
+  formatTime,
+  getEmailSignature,
+} from '@/utils/email-utils';
 import { ADMIN_EMAIL } from '@/constants/email';
 
 export function createCancelledTemplate(
@@ -87,23 +91,15 @@ export function createCancelledTemplate(
   const content = `안녕하세요 ${booking.customer_name}님,
 
 ${cancellationIntro}
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 ${refundSection}
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${closingMessage}
 
-감사합니다.
-
-이메일: ${ADMIN_EMAIL}
-
-Chef Minho
-Washoku Hana – Private Omakase Experience`;
+${getEmailSignature()}`;
 
   const subject = `Washoku Hana 예약 취소 (${formattedDate}) 및 환불 안내`;
 

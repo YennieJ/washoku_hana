@@ -1,4 +1,14 @@
 import type { Booking } from '@/lib/supabase';
+import { ADMIN_EMAIL } from '@/constants/email';
+
+// 이메일 템플릿 공통 서명
+export function getEmailSignature(): string {
+  return `감사합니다.
+
+문의 이메일: ${ADMIN_EMAIL}
+Chef Minho
+Washoku Hana – Private Omakase Experience`;
+}
 
 // 시간을 12시간 형식으로 변환 (19:00 -> 7:00 PM)
 export function formatTime(time: string): string {

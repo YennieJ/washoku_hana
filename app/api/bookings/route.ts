@@ -30,32 +30,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 예약 번호 생성: BK-YYYY-MMDD-XXX
-    const bookingDate = new Date(body.booking_date);
-    const year = bookingDate.getFullYear();
-    const month = String(bookingDate.getMonth() + 1).padStart(2, '0');
-    const day = String(bookingDate.getDate()).padStart(2, '0');
-    const datePrefix = `BK-${year}-${month}${day}`;
-
-    // 같은 날짜의 예약 중 가장 큰 번호 찾기
-    const { data: existingBookings } = await supabase
-      .from('bookings')
-      .select('booking_number')
-      .like('booking_number', `${datePrefix}%`)
-      .order('booking_number', { ascending: false })
-      .limit(1);
-
-    let sequenceNumber = 1;
-    if (existingBookings && existingBookings.length > 0) {
-      const lastNumber = existingBookings[0].booking_number;
-      const lastSequence = parseInt(lastNumber.split('-').pop() || '0');
-      sequenceNumber = lastSequence + 1;
-    }
-
-    const bookingNumber = `${datePrefix}-${String(sequenceNumber).padStart(
-      3,
-      '0'
-    )}`;
+    // 예약 번호 생성: BK-타임스탬프-랜덤문자열 (DB 조회 없이 간단하게)
+    const timestamp = Date.now();
+    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const bookingNumber = `BK-${timestamp}-${randomStr}`;
 
     // 데이터 삽입
     const { data, error } = await supabase
