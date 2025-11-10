@@ -63,12 +63,12 @@ export default function PeriodFilter({
       <button
         type="button"
         onClick={() => setIsPeriodOpen((v) => !v)}
-        className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-md text-sm bg-white text-gray-900 hover:bg-gray-50"
+        className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1.5 border border-gray-200 rounded-md text-xs lg:text-sm bg-white text-gray-900 hover:bg-gray-50"
       >
-        <span className="text-gray-700">기간:</span>
+        <span className="text-gray-700 hidden lg:inline">기간:</span>
         <span className="font-medium">{getPeriodLabel()}</span>
         <svg
-          className={`w-4 h-4 transition-transform ${
+          className={`w-3 h-3 lg:w-4 lg:h-4 transition-transform ${
             isPeriodOpen ? 'rotate-180' : ''
           }`}
           viewBox="0 0 20 20"

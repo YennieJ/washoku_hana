@@ -108,15 +108,15 @@ export default function AdminDashboard() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
+        <div className="px-3 lg:px-6 py-3 lg:py-4">
+          <h1 className="text-lg lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3 lg:mb-4">
             Washoku Hana - 예약 관리
           </h1>
 
           {/* 필터 영역 (컴팩트) */}
-          <div className="mb-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            {/* 왼쪽: 기간 + 읽음 상태 + 상태 필터 */}
-            <div className="flex items-center gap-3 flex-wrap">
+          <div className="mb-2 flex flex-col gap-3">
+            {/* 첫 번째 줄: 기간 + 검색 */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
               <PeriodFilter
                 period={period}
                 setPeriod={setPeriod}
@@ -128,32 +128,32 @@ export default function AdminDashboard() {
                 setPeriodSearchActive={setPeriodSearchActive}
               />
 
-              {/* 읽음 상태 */}
-              <ReadFilter
-                readFilter={readFilter}
-                setReadFilter={setReadFilter}
-                totalCount={totalCount}
-                unreadCount={unreadCount}
-              />
-
-              {/* 상태 필터 */}
-              <StatusFilter
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
+              {/* 검색 */}
+              <SearchInput
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
               />
             </div>
 
-            {/* 오른쪽: 검색 */}
-            <SearchInput
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
+            {/* 두 번째 줄: 읽음 상태 */}
+            <ReadFilter
+              readFilter={readFilter}
+              setReadFilter={setReadFilter}
+              totalCount={totalCount}
+              unreadCount={unreadCount}
+            />
+
+            {/* 세 번째 줄: 상태 필터 */}
+            <StatusFilter
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
             />
           </div>
         </div>
       </div>
 
       {/* Main Content - Table */}
-      <main className="flex-1 min-h-0 overflow-y-auto p-6">
+      <main className="flex-1 min-h-0 overflow-y-auto p-3 lg:p-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 min-h-[600px]">
           {error ? (
             <div className="flex items-center justify-center h-[600px]">

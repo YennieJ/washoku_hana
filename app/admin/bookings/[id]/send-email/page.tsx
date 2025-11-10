@@ -586,15 +586,15 @@ export default function SendEmailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 flex flex-col overflow-hidden">
-      <div className="flex-1 flex flex-col mx-auto w-full px-4 py-6 overflow-hidden min-h-0">
+    <div className="min-h-screen lg:h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col mx-auto w-full px-4 lg:px-6 py-4 lg:py-6 overflow-hidden min-h-0">
         {/* 헤더 */}
-        <div className="mb-4 flex justify-between items-center flex-shrink-0">
-          <h1 className="text-2xl font-bold text-gray-900">메일 전송</h1>
-          <div className="flex gap-3">
+        <div className="mb-3 lg:mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">메일 전송</h1>
+          <div className="flex gap-2 lg:gap-3 w-full sm:w-auto">
             <button
               onClick={() => router.back()}
-              className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-700"
+              className="flex-1 sm:flex-none px-4 lg:px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 text-sm lg:text-base"
             >
               취소
             </button>
@@ -608,7 +608,7 @@ export default function SendEmailPage({ params }: PageProps) {
                 !subject.trim() ||
                 !content.trim()
               }
-              className={`px-6 py-2 rounded text-white ${
+              className={`flex-1 sm:flex-none px-4 lg:px-6 py-2 rounded text-white text-sm lg:text-base ${
                 sendEmailMutation.isPending ||
                 updateBookingMutation.isPending ||
                 addCalendarEventMutation.isPending ||
@@ -620,9 +620,9 @@ export default function SendEmailPage({ params }: PageProps) {
               }`}
             >
               {updateBookingMutation.isPending
-                ? '금액 정보 업데이트 중...'
+                ? '업데이트 중...'
                 : sendEmailMutation.isPending
-                ? '이메일 전송 중...'
+                ? '전송 중...'
                 : addCalendarEventMutation.isPending
                 ? '캘린더 추가 중...'
                 : deleteCalendarEventMutation.isPending
@@ -632,11 +632,11 @@ export default function SendEmailPage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 flex-1 overflow-hidden min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-3 lg:gap-4 flex-1 overflow-hidden min-h-0">
           {/* 좌측: 메일 종류 & 예약 정보 & 금액 정보 */}
-          <div className="space-y-3 lg:col-span-2 flex flex-col overflow-hidden min-h-0">
+          <div className="space-y-3 lg:col-span-2 flex flex-col overflow-y-auto lg:overflow-y-hidden min-h-0 max-h-[calc(100vh-200px)] lg:max-h-none pb-2 lg:pb-0">
             {/* 메일 종류 */}
-            <div className="bg-white rounded-lg shadow-md p-4 flex-shrink-0">
+            <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 flex-shrink-0">
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 메일 종류
               </label>
@@ -644,7 +644,7 @@ export default function SendEmailPage({ params }: PageProps) {
                 <button
                   type="button"
                   onClick={() => setIsMailTypeOpen(!isMailTypeOpen)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-left flex justify-between items-center"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-left flex justify-between items-center text-sm lg:text-base"
                 >
                   <span>
                     {selectedMailType === 'CUSTOM'
@@ -657,7 +657,7 @@ export default function SendEmailPage({ params }: PageProps) {
                 </button>
 
                 {isMailTypeOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-[300px] overflow-y-auto">
                     {allMailTypeOptions.map((status) => (
                       <button
                         key={status.value}
@@ -668,7 +668,7 @@ export default function SendEmailPage({ params }: PageProps) {
                           );
                           setIsMailTypeOpen(false);
                         }}
-                        className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
+                        className={`w-full px-3 py-2 text-left hover:bg-gray-100 text-sm lg:text-base ${
                           selectedMailType === status.value
                             ? 'bg-blue-50 text-blue-700'
                             : 'text-gray-900'
@@ -683,11 +683,11 @@ export default function SendEmailPage({ params }: PageProps) {
             </div>
 
             {selectedMailType === 'CUSTOM' && (
-              <div className="bg-white rounded-lg shadow-md p-4 flex-1 overflow-y-auto">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="bg-white rounded-lg shadow-md p-3 lg:p-4 flex-1 overflow-y-auto">
+                <h2 className="text-lg lg:text-xl font-semibold text-gray-900 mb-3 lg:mb-4">
                   예약 정보
                 </h2>
-                <div className="space-y-4 text-gray-900 text-sm">
+                <div className="space-y-3 lg:space-y-4 text-gray-900 text-sm">
                   <div className="space-y-2">
                     <p>
                       <strong>예약 번호:</strong> {booking.booking_number}
@@ -776,10 +776,10 @@ export default function SendEmailPage({ params }: PageProps) {
           </div>
 
           {/* 우측: 이메일 편집 */}
-          <div className="lg:col-span-4 flex flex-col overflow-hidden min-h-0">
+          <div className="lg:col-span-4 flex flex-col overflow-hidden min-h-[500px] lg:min-h-0">
             {/* 이메일 편집 */}
-            <div className="bg-white rounded-lg shadow-md p-6 flex flex-col flex-1 overflow-hidden min-h-0">
-              <div className="flex flex-col flex-1 space-y-4 overflow-hidden min-h-0">
+            <div className="bg-white rounded-lg shadow-md p-4 lg:p-6 flex flex-col flex-1 overflow-hidden min-h-0">
+              <div className="flex flex-col flex-1 space-y-3 lg:space-y-4 overflow-hidden min-h-0">
                 <div className="flex-shrink-0">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     제목
@@ -788,7 +788,7 @@ export default function SendEmailPage({ params }: PageProps) {
                     type="text"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm lg:text-base"
                     placeholder="제목을 입력하세요"
                   />
                 </div>
@@ -796,7 +796,7 @@ export default function SendEmailPage({ params }: PageProps) {
                 <div className="flex flex-col flex-1 overflow-hidden min-h-0">
                   <label className="block text-sm font-medium text-gray-900 mb-2 flex-shrink-0">
                     내용
-                    <span className="ml-2 text-xs text-gray-500">
+                    <span className="ml-2 text-xs text-gray-500 hidden sm:inline">
                       (메일 수정 정보 입력 시 자동으로 업데이트되며, 직접 수정도
                       가능합니다)
                     </span>
@@ -805,7 +805,7 @@ export default function SendEmailPage({ params }: PageProps) {
                     ref={contentTextareaRef}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="w-full flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 resize-none font-mono text-sm overflow-y-auto"
+                    className="w-full flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 resize-none font-mono text-xs lg:text-sm overflow-y-auto min-h-[300px] lg:min-h-0"
                     placeholder="내용을 입력하세요"
                   />
                 </div>
