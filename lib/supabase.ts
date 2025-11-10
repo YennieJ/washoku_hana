@@ -47,4 +47,5 @@ export type Booking = {
   updated_at: string;
   refund_amount: number;
   chef_additional_cost: number;
+  calendar_event_id: string | null;
 };

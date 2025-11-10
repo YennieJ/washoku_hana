@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSendEmail } from '@/hooks/useSendEmail';
 import { useUpdateBooking } from '@/hooks/useUpdateBooking';
+import { useAddCalendarEvent } from '@/hooks/useAddCalendarEvent';
+import { useDeleteCalendarEvent } from '@/hooks/useDeleteCalendarEvent';
 import type { Booking } from '@/lib/supabase';
 import {
   RESERVATION_STATUSES,
@@ -28,6 +30,8 @@ export default function SendEmailPage({ params }: PageProps) {
   const queryClient = useQueryClient();
   const sendEmailMutation = useSendEmail();
   const updateBookingMutation = useUpdateBooking();
+  const addCalendarEventMutation = useAddCalendarEvent();
+  const deleteCalendarEventMutation = useDeleteCalendarEvent();
 
   // React Query 캐시에서 예약 정보 가져오기
   const booking = useMemo(() => {
@@ -510,8 +514,46 @@ export default function SendEmailPage({ params }: PageProps) {
             },
             {
               onSuccess: () => {
-                alert('상태가 업데이트되고 이메일이 전송되었습니다.');
-                router.push('/admin/dashboard');
+                // 3단계: 예약 확정 상태인 경우 캘린더 이벤트 추가
+                if (selectedMailType === 'CONFIRMED') {
+                  addCalendarEventMutation.mutate(
+                    { bookingId: booking.id },
+                    {
+                      onSuccess: () => {
+                        // 성공 시 알림 없이 바로 이동
+                        router.push('/admin/dashboard');
+                      },
+                      onError: (error) => {
+                        // 캘린더 추가 실패는 경고만 표시하고 계속 진행
+                        alert(
+                          `상태 업데이트 및 이메일 전송 완료. 캘린더 추가 실패: ${error.message}`
+                        );
+                        router.push('/admin/dashboard');
+                      },
+                    }
+                  );
+                } else if (selectedMailType === 'CANCELLED') {
+                  // 예약 취소 상태인 경우 캘린더 이벤트 삭제
+                  deleteCalendarEventMutation.mutate(
+                    { bookingId: booking.id },
+                    {
+                      onSuccess: () => {
+                        // 성공 시 알림 없이 바로 이동
+                        router.push('/admin/dashboard');
+                      },
+                      onError: (error) => {
+                        // 캘린더 삭제 실패는 경고만 표시하고 계속 진행
+                        alert(
+                          `상태 업데이트 및 이메일 전송 완료. 캘린더 삭제 실패: ${error.message}`
+                        );
+                        router.push('/admin/dashboard');
+                      },
+                    }
+                  );
+                } else {
+                  // 다른 상태인 경우 알림 없이 바로 이동
+                  router.push('/admin/dashboard');
+                }
               },
               onError: (error) => {
                 alert(
@@ -561,12 +603,16 @@ export default function SendEmailPage({ params }: PageProps) {
               disabled={
                 sendEmailMutation.isPending ||
                 updateBookingMutation.isPending ||
+                addCalendarEventMutation.isPending ||
+                deleteCalendarEventMutation.isPending ||
                 !subject.trim() ||
                 !content.trim()
               }
               className={`px-6 py-2 rounded text-white ${
                 sendEmailMutation.isPending ||
                 updateBookingMutation.isPending ||
+                addCalendarEventMutation.isPending ||
+                deleteCalendarEventMutation.isPending ||
                 !subject.trim() ||
                 !content.trim()
                   ? 'bg-gray-400 cursor-not-allowed'
@@ -577,6 +623,10 @@ export default function SendEmailPage({ params }: PageProps) {
                 ? '금액 정보 업데이트 중...'
                 : sendEmailMutation.isPending
                 ? '이메일 전송 중...'
+                : addCalendarEventMutation.isPending
+                ? '캘린더 추가 중...'
+                : deleteCalendarEventMutation.isPending
+                ? '캘린더 삭제 중...'
                 : '이메일 전송'}
             </button>
           </div>

@@ -12,6 +12,7 @@
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.76.1",
     "@tanstack/react-query": "^5.90.5",
+    "googleapis": "^165.0.0",
     "install": "^0.13.0",
     "next": "16.0.0",
     "npm": "^11.6.2",
