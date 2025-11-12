@@ -4,13 +4,6 @@ import { ADMIN_EMAIL } from '@/constants/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// 고객 이메일을 관리자로 리다이렉트할지 여부 (환경 변수로 제어)
-// true: 모든 고객 이메일이 관리자에게 전송됨 (테스트 모드)
-// false: 고객에게 직접 전송 (프로덕션 모드)
-// 기본값: true (환경 변수가 설정되지 않으면 관리자에게 전송)
-const REDIRECT_CUSTOMER_EMAIL_TO_ADMIN =
-  process.env.REDIRECT_CUSTOMER_EMAIL_TO_ADMIN !== 'false';
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -98,22 +91,11 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    // 고객 이메일 주소 결정 (리다이렉트 설정에 따라)
-    const recipientEmail = REDIRECT_CUSTOMER_EMAIL_TO_ADMIN
-      ? ADMIN_EMAIL
-      : formData.email;
-
-    // 제목에 리다이렉트 여부 표시
-    const subjectPrefix = REDIRECT_CUSTOMER_EMAIL_TO_ADMIN
-      ? `[관리자 확인용 - 원래 수신자: ${formData.email}]`
-      : '';
-    const subject = `${subjectPrefix}${formData.name}님 예약 확인 - ${selectedDate}`;
-
     // Resend로 이메일 전송
     const { data, error } = await resend.emails.send({
       from: 'Washoku Hana <noreply@resend.dev>',
-      to: recipientEmail,
-      subject: subject,
+      to: formData.email,
+      subject: `${formData.name}님 예약 확인 - ${selectedDate}`,
       html: emailHtml,
     });
 
