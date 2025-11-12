@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     // 필수 필드 검증
     if (!formData) {
       return NextResponse.json(
-        { error: 'formData가 누락되었습니다.' },
+        { error: 'formData is missing.' },
         { status: 400 }
       );
     }
@@ -141,25 +141,26 @@ export async function POST(request: NextRequest) {
       to: ADMIN_EMAIL,
       subject: `[예약 요청] ${formData.name}님 - ${selectedDate}`,
       html: emailHtml,
+      replyTo: formData.email, // 답장 주소 추가 (고객 이메일로)
     });
 
     if (error) {
       console.error('Resend error:', error);
       return NextResponse.json(
-        { error: '이메일 전송에 실패했습니다.' },
+        { error: 'Failed to send email.' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: '이메일이 성공적으로 전송되었습니다.',
+      message: 'Email sent successfully.',
       data,
     });
   } catch (error: any) {
     console.error('Email send error:', error);
     return NextResponse.json(
-      { error: error.message || '이메일 전송 중 오류가 발생했습니다.' },
+      { error: error.message || 'An error occurred while sending email.' },
       { status: 500 }
     );
   }

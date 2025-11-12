@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     // 필수 필드 검증
     if (!bookingId || !subject || !htmlContent || !to) {
       return NextResponse.json(
-        { error: '필수 필드가 누락되었습니다.' },
+        { error: 'Required fields are missing.' },
         { status: 400 }
       );
     }
@@ -30,20 +30,20 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Resend error:', error);
       return NextResponse.json(
-        { error: '이메일 전송에 실패했습니다.' },
+        { error: 'Failed to send email.' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: '이메일이 성공적으로 전송되었습니다.',
+      message: 'Email sent successfully.',
       data,
     });
   } catch (error: any) {
     console.error('Email send error:', error);
     return NextResponse.json(
-      { error: error.message || '이메일 전송 중 오류가 발생했습니다.' },
+      { error: error.message || 'An error occurred while sending email.' },
       { status: 500 }
     );
   }

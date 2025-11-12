@@ -22,8 +22,9 @@ export async function POST(request: NextRequest) {
 
     for (const field of requiredFields) {
       if (!body[field]) {
+        const fieldName = field.replace(/_/g, ' ');
         return NextResponse.json(
-          { error: `${field}는 필수 항목입니다.` },
+          { error: `${fieldName} is required.` },
           { status: 400 }
         );
       }

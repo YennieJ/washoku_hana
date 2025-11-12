@@ -12,14 +12,14 @@ export async function POST(request: NextRequest) {
     // 필수 필드 검증
     if (!formData || !formData.email || !formData.name) {
       return NextResponse.json(
-        { error: '필수 필드가 누락되었습니다.' },
+        { error: 'Required fields are missing.' },
         { status: 400 }
       );
     }
 
     if (!selectedDate || !bookingNumber) {
       return NextResponse.json(
-        { error: '예약 날짜 또는 예약 번호가 누락되었습니다.' },
+        { error: 'Booking date or booking number is missing.' },
         { status: 400 }
       );
     }
@@ -95,27 +95,31 @@ export async function POST(request: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: 'Washoku Hana <noreply@washokuhana.ca>',
       to: formData.email, // 고객에게 전송
-      subject: `${formData.name}님 예약 확인 - ${selectedDate}`,
+      subject: `[Washoku Hana] ${formData.name}님 예약 확인 - ${selectedDate}`,
       html: emailHtml,
+      replyTo: ADMIN_EMAIL, // 답장 주소 추가 (스팸 점수 감소)
     });
 
     if (error) {
       console.error('Resend error:', error);
       return NextResponse.json(
-        { error: '고객 이메일 전송에 실패했습니다.' },
+        { error: 'Failed to send customer email.' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: '고객 이메일이 성공적으로 전송되었습니다.',
+      message: 'Customer email sent successfully.',
       data,
     });
   } catch (error: any) {
     console.error('Customer email send error:', error);
     return NextResponse.json(
-      { error: error.message || '고객 이메일 전송 중 오류가 발생했습니다.' },
+      {
+        error:
+          error.message || 'An error occurred while sending customer email.',
+      },
       { status: 500 }
     );
   }
