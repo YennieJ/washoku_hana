@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase';
-import { cookies } from 'next/headers';
+import { createSupabaseAdminClient } from '@/lib/supabase';
 
 // 일반 서비스용: 고객이 새 예약을 생성할 때 사용
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    // RLS를 우회하기 위해 Admin Client 사용
+    const supabase = createSupabaseAdminClient();
 
     const body = await request.json();
 

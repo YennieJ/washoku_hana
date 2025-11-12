@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase';
-import { cookies } from 'next/headers';
+import { createSupabaseAdminClient } from '@/lib/supabase';
 
 // 예약 불가능한 날짜 목록 조회 (예약금 확인, 예약금 조정, 예약 확정 상태)
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    // 공개 API이므로 Admin Client 사용 (RLS 우회)
+    const supabase = createSupabaseAdminClient();
 
     // 예약 불가능한 상태 목록
     const unavailableStatuses = [

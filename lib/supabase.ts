@@ -1,8 +1,10 @@
 import { createBrowserClient, createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { ReservationStatus } from '@/constants/reservation-statuses';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // 브라우저용 클라이언트 (클라이언트 컴포넌트에서 사용)
 export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
@@ -21,6 +23,17 @@ export function createSupabaseServerClient(cookieStore: any) {
           cookieStore.set(name, value, options)
         );
       },
+    },
+  });
+}
+
+// Service Role 클라이언트 (관리자 권한 - RLS 우회)
+// 주의: 서버 측 API route에서만 사용해야 함!
+export function createSupabaseAdminClient() {
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
     },
   });
 }
