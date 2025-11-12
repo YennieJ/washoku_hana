@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
 
     // Resend로 이메일 전송
     const { data, error } = await resend.emails.send({
-      from: 'Washoku Hana <noreply@resend.dev>', // 테스트 모드
+      from: 'Washoku Hana <noreply@washokuhana.ca>',
       to: ADMIN_EMAIL,
       subject: `[예약 요청] ${formData.name}님 - ${selectedDate}`,
       html: emailHtml,

@@ -63,100 +63,128 @@ export default function BookingForm({
     setShowConfirmModal(true);
   };
 
-  const handleConfirmBooking = () => {
-    const bookingDateTime = `${selectedDate}T19:00:00`;
+  const handleConfirmBooking = async () => {
+    // TODO: 예약 API 호출 주석처리 (테스트용)
+    // const bookingDateTime = `${selectedDate}T19:00:00`;
 
-    bookingMutation.mutate(
-      {
-        customer_name: formData.name,
-        customer_email: formData.email,
-        customer_phone: formData.phone,
-        booking_date: bookingDateTime,
-        guest_count: Number(formData.guestCount),
-        menu: formData.menu,
-        address: formData.address,
-        food_allergy: formData.foodAllergy || '없음',
-        special_requests: formData.requests || null,
-      },
-      {
-        onSuccess: async (result) => {
-          // sessionStorage에 예약 번호 저장 (예약 성공 직후 1회만)
-          sessionStorage.setItem('bookingNumber', result.data.booking_number);
+    // bookingMutation.mutate(
+    //   {
+    //     customer_name: formData.name,
+    //     customer_email: formData.email,
+    //     customer_phone: formData.phone,
+    //     booking_date: bookingDateTime,
+    //     guest_count: Number(formData.guestCount),
+    //     menu: formData.menu,
+    //     address: formData.address,
+    //     food_allergy: formData.foodAllergy || '없음',
+    //     special_requests: formData.requests || null,
+    //   },
+    //   {
+    //     onSuccess: async (result) => {
+    //       // sessionStorage에 예약 번호 저장 (예약 성공 직후 1회만)
+    //       sessionStorage.setItem('bookingNumber', result.data.booking_number);
 
-          const errors: string[] = [];
+    //       const errors: string[] = [];
 
-          try {
-            // 예약 성공 후 관리자에게 이메일 전송
-            try {
-              await adminEmailMutation.mutateAsync({
-                formData,
-                selectedDate,
-                selectedDayName,
-              });
-            } catch (adminError) {
-              const adminErrorMessage =
-                adminError instanceof Error
-                  ? adminError.message
-                  : String(adminError);
-              errors.push(`관리자 이메일: ${adminErrorMessage}`);
-            }
+    //       try {
+    //         // TODO: 관리자 이메일 전송 주석처리 (테스트용)
+    //         // 예약 성공 후 관리자에게 이메일 전송
+    //         // try {
+    //         //   await adminEmailMutation.mutateAsync({
+    //         //     formData,
+    //         //     selectedDate,
+    //         //     selectedDayName,
+    //         //   });
+    //         // } catch (adminError) {
+    //         //   const adminErrorMessage =
+    //         //     adminError instanceof Error
+    //         //       ? adminError.message
+    //         //       : String(adminError);
+    //         //   errors.push(`관리자 이메일: ${adminErrorMessage}`);
+    //         // }
 
-            // 고객에게 이메일 전송
-            try {
-              await customerEmailMutation.mutateAsync({
-                formData,
-                selectedDate,
-                selectedDayName,
-                bookingNumber: result.data.booking_number,
-              });
-            } catch (customerError) {
-              const customerErrorMessage =
-                customerError instanceof Error
-                  ? customerError.message
-                  : String(customerError);
-              errors.push(`고객 이메일: ${customerErrorMessage}`);
-            }
+    //         // 고객에게 이메일 전송
+    //         try {
+    //           await customerEmailMutation.mutateAsync({
+    //             formData,
+    //             selectedDate,
+    //             selectedDayName,
+    //             bookingNumber: result.data.booking_number,
+    //           });
+    //         } catch (customerError) {
+    //           const customerErrorMessage =
+    //             customerError instanceof Error
+    //               ? customerError.message
+    //               : String(customerError);
+    //           errors.push(`고객 이메일: ${customerErrorMessage}`);
+    //         }
 
-            // 이메일 전송 결과 확인
-            if (errors.length > 0) {
-              alert(
-                '예약은 성공적으로 완료되었으나, 일부 이메일 전송에 실패했습니다.\n\n' +
-                  '실패한 이메일:\n' +
-                  errors.join('\n') +
-                  '\n\n예약 번호: ' +
-                  result.data.booking_number +
-                  '\n\n고객센터로 문의해주세요.'
-              );
-            }
+    //         // 이메일 전송 결과 확인
+    //         if (errors.length > 0) {
+    //           alert(
+    //             '예약은 성공적으로 완료되었으나, 일부 이메일 전송에 실패했습니다.\n\n' +
+    //               '실패한 이메일:\n' +
+    //               errors.join('\n') +
+    //               '\n\n예약 번호: ' +
+    //               result.data.booking_number +
+    //               '\n\n고객센터로 문의해주세요.'
+    //           );
+    //         }
 
-            // 완료 페이지로 이동
-            router.push('/reservation/complete');
-          } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : String(error);
+    //         // 완료 페이지로 이동
+    //         router.push('/reservation/complete');
+    //       } catch (error) {
+    //         const errorMessage =
+    //           error instanceof Error ? error.message : String(error);
 
-            alert(
-              '예약은 성공적으로 완료되었으나, 이메일 전송 중 오류가 발생했습니다.\n\n' +
-                '오류: ' +
-                errorMessage +
-                '\n\n예약 번호: ' +
-                result.data.booking_number +
-                '\n\n고객센터로 문의해주세요.'
-            );
-            // 완료 페이지로 이동
-            router.push('/reservation/complete');
-          }
-        },
-        onError: (error) => {
-          alert(
-            error instanceof Error
-              ? error.message
-              : 'An error occurred while submitting your booking. Please try again.'
-          );
-          setShowConfirmModal(false);
-        },
-      }
-    );
+    //         alert(
+    //           '예약은 성공적으로 완료되었으나, 이메일 전송 중 오류가 발생했습니다.\n\n' +
+    //             '오류: ' +
+    //             errorMessage +
+    //             '\n\n예약 번호: ' +
+    //             result.data.booking_number +
+    //             '\n\n고객센터로 문의해주세요.'
+    //         );
+    //         // 완료 페이지로 이동
+    //         router.push('/reservation/complete');
+    //       }
+    //     },
+    //     onError: (error) => {
+    //       alert(
+    //         error instanceof Error
+    //           ? error.message
+    //           : 'An error occurred while submitting your booking. Please try again.'
+    //       );
+    //       setShowConfirmModal(false);
+    //     },
+    //   }
+    // );
+
+    // 테스트용: 가짜 예약 번호 생성 후 고객 이메일 전송
+    const timestamp = Date.now();
+    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const mockBookingNumber = `BK-${timestamp}-${randomStr}`;
+
+    sessionStorage.setItem('bookingNumber', mockBookingNumber);
+
+    // 고객에게 이메일 전송
+    try {
+      await customerEmailMutation.mutateAsync({
+        formData,
+        selectedDate,
+        selectedDayName,
+        bookingNumber: mockBookingNumber,
+      });
+    } catch (customerError) {
+      const customerErrorMessage =
+        customerError instanceof Error
+          ? customerError.message
+          : String(customerError);
+      alert(`고객 이메일 전송 실패: ${customerErrorMessage}`);
+    }
+
+    // 완료 페이지로 이동
+    router.push('/reservation/complete');
   };
 
   return (

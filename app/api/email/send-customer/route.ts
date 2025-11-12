@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { ADMIN_EMAIL } from '@/constants/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -17,11 +18,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Resend로 이메일 전송
+    // 관리자가 직접 보내는 이메일
     const { data, error } = await resend.emails.send({
-      from: 'Washoku Hana <noreply@resend.dev>',
+      from: 'Washoku Hana <info@washokuhana.ca>',
       to: to,
       subject: subject,
       html: htmlContent,
+      replyTo: ADMIN_EMAIL, // 답장은 관리자 Gmail로
     });
 
     if (error) {
