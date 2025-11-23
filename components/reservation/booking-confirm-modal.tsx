@@ -6,7 +6,6 @@ interface BookingConfirmModalProps {
     email: string;
     phone: string;
     guestCount: string;
-    guestType: string;
     menu: string;
     address: string;
     foodAllergy: string;
@@ -54,13 +53,7 @@ export default function BookingConfirmModal({
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Number of Guests:</span>
-              <span className="text-white">
-                {formData.guestCount} (
-                {formData.guestType === 'small'
-                  ? 'Up to 8 guests'
-                  : 'More than 8 guests'}
-                )
-              </span>
+              <span className="text-white">{formData.guestCount}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Menu:</span>

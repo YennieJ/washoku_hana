@@ -8,7 +8,6 @@ interface SendBookingConfirmationEmailRequest {
     name: string;
     email: string;
     phone: string;
-    guestType: string;
     guestCount: string;
     menu: string;
     address: string;

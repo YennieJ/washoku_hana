@@ -1,16 +1,27 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Navigation from '@/components/navigation';
 import BookingCalendar from '@/components/reservation/booking-calendar';
 import BookingForm from '@/components/reservation/booking-form';
 import Footer from '@/components/footer';
 
 export default function ReservationPage() {
+  const searchParams = useSearchParams();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDayName, setSelectedDayName] = useState('');
+  const [initialMenu, setInitialMenu] = useState<string>('');
   const bookingFormRef = useRef<HTMLElement>(null);
   const isClient = true; // 클라이언트 컴포넌트에서는 항상 true
+
+  // URL에서 메뉴 파라미터 읽기
+  useEffect(() => {
+    const menuParam = searchParams.get('menu');
+    if (menuParam) {
+      setInitialMenu(decodeURIComponent(menuParam));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -158,6 +169,7 @@ export default function ReservationPage() {
               <BookingForm
                 selectedDate={selectedDate}
                 selectedDayName={selectedDayName}
+                initialMenu={initialMenu}
               />
             </div>
           </section>

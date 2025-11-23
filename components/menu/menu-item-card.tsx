@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface MenuItemCardProps {
   image: string;
@@ -8,6 +9,9 @@ interface MenuItemCardProps {
   description: string;
   price: string;
   imageFit?: 'cover' | 'contain';
+  minGuests: number;
+  maxGuests: number;
+  inquiryRequired?: number;
 }
 
 export default function MenuItemCard({
@@ -18,6 +22,9 @@ export default function MenuItemCard({
   description,
   price,
   imageFit = 'cover',
+  minGuests,
+  maxGuests,
+  inquiryRequired,
 }: MenuItemCardProps) {
   return (
     <div className="group bg-white/5 border border-primary/20 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/40 backdrop-blur-sm">
@@ -47,8 +54,24 @@ export default function MenuItemCard({
               {description}
             </p>
           </div>
-          <div className="text-xl lg:text-2xl font-light text-gray-400 text-right mt-6">
-            {price}
+          <div className="mt-3 space-y-3">
+            <div className="flex items-center gap-4 flex-wrap sm:justify-between">
+              <div className="text-sm text-gray-400 whitespace-nowrap">
+                {minGuests}-{maxGuests} guests
+                {inquiryRequired && (
+                  <span className="text-xs ml-1">(Over max: email)</span>
+                )}
+              </div>
+              <div className="text-xl lg:text-2xl font-light text-gray-400 whitespace-nowrap">
+                {price}
+              </div>
+            </div>
+            <Link
+              href={`/reservation?menu=${encodeURIComponent(title)}`}
+              className="block w-full py-3 bg-primary text-white hover:bg-primary/90 transition-colors font-light text-center tracking-wide"
+            >
+              Make a Reservation
+            </Link>
           </div>
         </div>
       </div>

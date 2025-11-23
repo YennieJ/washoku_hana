@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import BookingConfirmModal from './booking-confirm-modal';
 import { menuItems } from '@/constants/menu-items';
@@ -9,17 +9,18 @@ import { useSendAdminEmail } from '@/hooks/useSendAdminEmail';
 interface BookingFormProps {
   selectedDate: string;
   selectedDayName: string;
+  initialMenu?: string;
 }
 
 export default function BookingForm({
   selectedDate,
   selectedDayName,
+  initialMenu = '',
 }: BookingFormProps) {
   const router = useRouter();
   const bookingMutation = useCreateBooking();
   const customerEmailMutation = useSendBookingConfirmationEmail();
   const adminEmailMutation = useSendAdminEmail();
-  const [isGuestTypeOpen, setIsGuestTypeOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,18 +28,45 @@ export default function BookingForm({
     name: '',
     email: '',
     phone: '',
-    guestType: '',
     guestCount: '',
-    menu: '',
+    menu: initialMenu,
     address: '',
     foodAllergy: '',
     requests: '',
   });
 
+  // initialMenu가 변경되면 formData 업데이트
+  useEffect(() => {
+    if (initialMenu) {
+      setFormData((prev) => ({ ...prev, menu: initialMenu }));
+    }
+  }, [initialMenu]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate date and guest count
+    // Validate menu selection
+    if (!formData.menu) {
+      alert('Please select a menu first.');
+      return;
+    }
+
+    const selectedMenu = menuItems.find((m) => m.title === formData.menu);
+    if (!selectedMenu) {
+      alert('Please select a valid menu.');
+      return;
+    }
+
+    // Validate guest count - only check minimum
+    const guestCount = Number(formData.guestCount);
+    if (!guestCount || guestCount < selectedMenu.minGuests) {
+      alert(
+        `Minimum ${selectedMenu.minGuests} guests required for ${selectedMenu.title}.`
+      );
+      return;
+    }
+
+    // Validate date - all reservations require at least 8 days from today
     const bookingDate = new Date(selectedDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -47,16 +75,9 @@ export default function BookingForm({
       (bookingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    if (formData.guestType === 'small' && daysDiff < 2) {
+    if (daysDiff < 8) {
       alert(
-        'Reservations for up to 8 guests must be made at least 2 days in advance.\nPlease choose another date.'
-      );
-      return;
-    }
-
-    if (formData.guestType === 'large' && daysDiff < 7) {
-      alert(
-        'Reservations for 9 or more guests must be made at least 1 week in advance.\nPlease choose another date.'
+        'All reservations must be made at least 8 days from today.\nPlease choose another date.'
       );
       return;
     }
@@ -212,112 +233,6 @@ export default function BookingForm({
           </div>
 
           <div>
-            <label className="block text-primary mb-2 font-light">
-              Guests *
-            </label>
-            <div className="flex space-x-3">
-              {/* Custom Dropdown */}
-              <div className="relative w-32">
-                <button
-                  type="button"
-                  onClick={() => setIsGuestTypeOpen(!isGuestTypeOpen)}
-                  className="w-full bg-black/30 border border-gray-700 px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors text-left flex justify-between items-center"
-                >
-                  <span
-                    className={
-                      formData.guestType ? 'text-white' : 'text-gray-400'
-                    }
-                  >
-                    {formData.guestType === 'small'
-                      ? 'Up to 8 guests'
-                      : formData.guestType === 'large'
-                      ? '9 or more guests'
-                      : 'Select'}
-                  </span>
-                  <span className="text-gray-400">▼</span>
-                </button>
-
-                {isGuestTypeOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-black/90 border border-gray-700 rounded z-10">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({
-                          ...formData,
-                          guestType: 'small',
-                          guestCount: '',
-                        });
-                        setIsGuestTypeOpen(false);
-                      }}
-                      className="w-full px-4 py-3 text-white hover:bg-primary/20 text-left transition-colors"
-                    >
-                      Up to 8 guests
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({
-                          ...formData,
-                          guestType: 'large',
-                          guestCount: '',
-                        });
-                        setIsGuestTypeOpen(false);
-                      }}
-                      className="w-full px-4 py-3 text-white hover:bg-primary/20 text-left transition-colors"
-                    >
-                      9 or more guests
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <input
-                type="number"
-                min="1"
-                max={formData.guestType === 'small' ? '8' : '20'}
-                value={formData.guestCount}
-                onChange={(e) =>
-                  setFormData({ ...formData, guestCount: e.target.value })
-                }
-                className="flex-1 bg-black/30 border border-gray-700 px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors"
-                placeholder={
-                  formData.guestType === 'small'
-                    ? '1–8 people'
-                    : formData.guestType === 'large'
-                    ? '9–20 people'
-                    : 'Select guest count'
-                }
-                required
-                disabled={!formData.guestType}
-              />
-            </div>
-            {formData.guestType === 'large' &&
-              (() => {
-                const bookingDate = new Date(selectedDate);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const daysDiff = Math.ceil(
-                  (bookingDate.getTime() - today.getTime()) /
-                    (1000 * 60 * 60 * 24)
-                );
-
-                if (daysDiff < 7) {
-                  return (
-                    <div className="mt-3 p-3 bg-red-900/30 border border-red-500/50 rounded">
-                      <p className="text-sm text-red-300 font-light">
-                        ⚠️ Groups of 9 or more require at least one week advance
-                        notice.
-                        <br />
-                        Please choose a date at least one week in advance.
-                      </p>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
-          </div>
-
-          <div>
             <label className="block text-primary mb-4 font-light">
               Menu Selection *
             </label>
@@ -331,33 +246,83 @@ export default function BookingForm({
                       : 'border-gray-700 bg-black/20 hover:border-gray-600'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="radio"
-                        name="menu"
-                        value={menu.title}
-                        checked={formData.menu === menu.title}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            menu: e.target.value,
-                          })
-                        }
-                        className="w-4 h-4 accent-primary cursor-pointer"
-                        required
-                      />
+                  <div className="flex items-center gap-3 w-full">
+                    <input
+                      type="radio"
+                      name="menu"
+                      value={menu.title}
+                      checked={formData.menu === menu.title}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          menu: e.target.value,
+                          guestCount: '', // 메뉴 변경 시 인원 수 초기화
+                        })
+                      }
+                      className="w-4 h-4 accent-primary cursor-pointer flex-shrink-0"
+                      required
+                    />
+                    <div className="flex-1 flex justify-between items-center flex-shrink-0">
                       <span className="text-white font-light">
                         {menu.title}
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {menu.minGuests}-{menu.maxGuests} guests
+                          {menu.inquiryRequired && (
+                            <span> (Over max: email)</span>
+                          )}
+                        </p>
+                      </span>
+                      <span className="text-primary font-light ml-4">
+                        {menu.price}
                       </span>
                     </div>
-                    <span className="text-primary font-light">
-                      {menu.price}
-                    </span>
                   </div>
                 </label>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-primary mb-2 font-light">
+              Guests *
+            </label>
+            {(() => {
+              const selectedMenu = menuItems.find(
+                (m) => m.title === formData.menu
+              );
+
+              if (!selectedMenu) {
+                return (
+                  <div className="p-4 bg-gray-800/50 border border-gray-700 rounded">
+                    <p className="text-sm text-gray-400">
+                      Please select a menu first to enter the number of guests.
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <>
+                  <input
+                    type="number"
+                    min={selectedMenu.minGuests}
+                    value={formData.guestCount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, guestCount: e.target.value })
+                    }
+                    className="w-full bg-black/30 border border-gray-700 px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors"
+                    placeholder={`Minimum ${selectedMenu.minGuests}`}
+                    required
+                  />
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    {selectedMenu.minGuests}-{selectedMenu.maxGuests} guests
+                    {selectedMenu.inquiryRequired && (
+                      <span> (Over max: email)</span>
+                    )}
+                  </p>
+                </>
+              );
+            })()}
           </div>
 
           <div>

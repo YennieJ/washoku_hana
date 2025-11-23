@@ -97,12 +97,12 @@ export default function BookingCalendar({
 
   const isPastDate = (day: number) => {
     const date = new Date(year, month, day);
-    // Reservation available only at least 2 days in advance (for up to 8 guests)
-    const twoDaysFromNow = new Date(today);
-    twoDaysFromNow.setDate(today.getDate() + 2);
-    twoDaysFromNow.setHours(0, 0, 0, 0);
+    // Reservation available only 8 days from today (7 days after today)
+    const sevenDaysFromNow = new Date(today);
+    sevenDaysFromNow.setDate(today.getDate() + 7);
+    sevenDaysFromNow.setHours(0, 0, 0, 0);
 
-    return date < twoDaysFromNow;
+    return date <= sevenDaysFromNow;
   };
 
   const isSelected = (day: number) => {
@@ -235,11 +235,8 @@ export default function BookingCalendar({
       <div className="mt-6 text-sm text-gray-400 space-y-1 font-light">
         <p>• Weekend reservations (Sat, Sun) at 7 PM only</p>
         <p>
-          • For up to 8 guests: reservations accepted at least 2 days in advance
-        </p>
-        <p>
-          • For 8 or more guests: reservations required at least 1 week in
-          advance
+          • All reservations require at least 1 week advance notice (8 days from
+          today)
         </p>
       </div>
     </div>
