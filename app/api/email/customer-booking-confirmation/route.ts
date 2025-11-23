@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { ADMIN_EMAIL } from '@/constants/email';
+import { menuItems } from '@/constants/menu-items';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -24,6 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 선택된 메뉴의 가격 정보 가져오기 및 총액 계산
+    const selectedMenu = menuItems.find((m) => m.title === formData.menu);
+    const menuPrice = selectedMenu ? selectedMenu.price : 'N/A';
+
     // 고객 이메일 본문 HTML 생성 (단순한 텍스트 기반)
     const emailHtml = `
       <!DOCTYPE html>
@@ -44,7 +49,7 @@ export async function POST(request: NextRequest) {
 
           <p><strong>예약 번호:</strong> ${bookingNumber}</p>
           <p><strong>예약 날짜:</strong> ${selectedDate} (${selectedDayName}) 오후 7시</p>
-          <p><strong>메뉴:</strong> ${formData.menu}</p>
+          <p><strong>메뉴:</strong> ${formData.menu} - ${menuPrice}</p>
           <p><strong>게스트 수:</strong> ${formData.guestCount}명</p>
           <p><strong>연락처:</strong> ${formData.phone}</p>
           <p><strong>서비스 주소:</strong> ${formData.address}</p>

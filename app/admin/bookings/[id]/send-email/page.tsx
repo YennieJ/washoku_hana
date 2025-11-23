@@ -19,6 +19,7 @@ import { updateTemplateContent } from '@/utils/template-updater';
 import type { EmailTemplateType } from '@/types/email-templates';
 import { ADMIN_EMAIL } from '@/constants/email';
 import { getEditCard } from '@/components/admin/send-email';
+import { menuItems } from '@/constants/menu-items';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -97,8 +98,25 @@ export default function SendEmailPage({ params }: PageProps) {
       if (booking.refund_amount && !refundAmount) {
         setRefundAmount(booking.refund_amount.toString());
       }
+      // 오마카세 코스 기본 가격 계산 (AWAITING_DEPOSIT이고 비어있을 때만)
+      if (
+        selectedMailType === 'AWAITING_DEPOSIT' &&
+        !courseAmount &&
+        booking.menu &&
+        booking.guest_count
+      ) {
+        const selectedMenu = menuItems.find((m) => m.title === booking.menu);
+        if (selectedMenu) {
+          const priceMatch = selectedMenu.price.match(/\$?(\d+)/);
+          const pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
+          const baseAmount = pricePerPerson * booking.guest_count;
+          if (baseAmount > 0) {
+            setCourseAmount(baseAmount.toString());
+          }
+        }
+      }
     }
-  }, [booking, reservationDate, refundAmount]);
+  }, [booking, reservationDate, refundAmount, selectedMailType, courseAmount]);
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -590,7 +608,9 @@ export default function SendEmailPage({ params }: PageProps) {
       <div className="flex-1 flex flex-col mx-auto w-full px-4 lg:px-6 py-4 lg:py-6 overflow-hidden min-h-0">
         {/* 헤더 */}
         <div className="mb-3 lg:mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">메일 전송</h1>
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">
+            메일 전송
+          </h1>
           <div className="flex gap-2 lg:gap-3 w-full sm:w-auto">
             <button
               onClick={() => router.back()}

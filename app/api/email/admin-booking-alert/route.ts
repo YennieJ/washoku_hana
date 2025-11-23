@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { ADMIN_EMAIL } from '@/constants/email';
+import { menuItems } from '@/constants/menu-items';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -25,6 +26,10 @@ export async function POST(request: NextRequest) {
         : `https://${origin}`
       : 'https://localhost:3000';
     const adminUrl = `${baseUrl}/admin/dashboard`;
+
+    // 선택된 메뉴의 가격 정보 가져오기
+    const selectedMenu = menuItems.find((m) => m.title === formData.menu);
+    const menuPrice = selectedMenu ? selectedMenu.price : 'N/A';
 
     // 이메일 본문 HTML 생성
     const emailHtml = `
@@ -68,7 +73,9 @@ export async function POST(request: NextRequest) {
               
               <div class="priority-item">
                 <div class="priority-label">🍱 메뉴</div>
-                <div class="priority-value">${formData.menu}</div>
+                <div class="priority-value">${
+                  formData.menu
+                } - ${menuPrice}</div>
               </div>
               
               <div class="priority-item">

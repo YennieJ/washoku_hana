@@ -17,9 +17,15 @@ export function createConfirmedTemplate(
     reservationDate,
   } = data;
 
-  const 총금액 = totalAmount || '0';
-  const 보증금 = depositAmount || '0';
-  const 잔금 = remainingAmount || '0';
+  // 금액 포맷팅 함수 (캐나다 달러 형식)
+  const formatCAD = (amount: string | number): string => {
+    const num = typeof amount === 'string' ? parseFloat(amount) || 0 : amount;
+    return num.toLocaleString('en-CA', { style: 'currency', currency: 'CAD' });
+  };
+
+  const 총금액 = parseFloat(totalAmount || '0');
+  const 보증금 = parseFloat(depositAmount || '0');
+  const 잔금 = parseFloat(remainingAmount || '0');
 
   // 8명 이상 여부 확인
   const isLargeGroup = booking.guest_count >= 8;
@@ -67,9 +73,11 @@ Washoku Hana의 예약이 확정되었습니다.
 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 금액 안내:
-총 금액: $${총금액}
-보증금 입금 확인: $${보증금}
-잔금: $${잔금} (잔금 결제는 서비스 당일, 셰프 도착 후 현장에서 **현금 또는 계좌이체**로 가능합니다.)
+총 금액: ${formatCAD(총금액)}
+보증금 입금 확인: ${formatCAD(보증금)}
+잔금: ${formatCAD(
+    잔금
+  )} (잔금 결제는 서비스 당일, 셰프 도착 후 현장에서 **현금 또는 계좌이체**로 가능합니다.)
 
 셰프 도착 시간: ${chefArrivalTime}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━

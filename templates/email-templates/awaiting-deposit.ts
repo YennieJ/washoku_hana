@@ -5,6 +5,7 @@ import {
   getEmailSignature,
 } from '@/utils/email-utils';
 import { ADMIN_EMAIL } from '@/constants/email';
+import { menuItems } from '@/constants/menu-items';
 
 export function createAwaitingDepositTemplate(
   data: EmailTemplateData
@@ -40,11 +41,29 @@ export function createAwaitingDepositTemplate(
     day: 'numeric',
   });
 
-  const 오마카세코스 = courseAmount || '0';
-  const 출장비 = travelFee || '0';
-  const 추가셰프비 = extraChefFee || '0';
-  const 총합계 = totalAmount || '0';
-  const 디파짓 = depositAmount || '0';
+  // 선택된 메뉴의 가격 정보 가져오기 및 기본 금액 계산
+  const selectedMenu = menuItems.find((m) => m.title === booking.menu);
+  const menuPrice = selectedMenu ? selectedMenu.price : 'N/A';
+
+  // 가격에서 숫자 추출 (예: "$149 per person" -> 149)
+  const priceMatch = menuPrice.match(/\$?(\d+)/);
+  const pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
+  const guestCount = booking.guest_count || 0;
+  const baseAmount = pricePerPerson * guestCount;
+
+  // 금액 포맷팅 함수 (캐나다 달러 형식)
+  const formatCAD = (amount: string | number): string => {
+    const num = typeof amount === 'string' ? parseFloat(amount) || 0 : amount;
+    return num.toLocaleString('en-CA', { style: 'currency', currency: 'CAD' });
+  };
+
+  // 오마카세 코스는 기본 금액(인원 × 메뉴 가격)으로 설정
+  const 오마카세코스 =
+    baseAmount > 0 ? baseAmount : parseFloat(courseAmount || '0');
+  const 출장비 = parseFloat(travelFee || '0');
+  const 추가셰프비 = parseFloat(extraChefFee || '0');
+  const 총합계 = parseFloat(totalAmount || '0');
+  const 디파짓 = parseFloat(depositAmount || '0');
 
   const bookingInfoSection = formatBookingInfoSection(
     booking,
@@ -59,19 +78,19 @@ Washoku Hana를 예약해 주셔서 감사합니다. 최고의 오마카세 경�
 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 비용 안내:
-오마카세 코스: $${오마카세코스}
-출장비: $${출장비}`;
+오마카세 코스 (${guestCount}명 × ${menuPrice}): ${formatCAD(오마카세코스)}
+출장비: ${formatCAD(출장비)}`;
   // 추가 셰프비가 0이 아닐 때만 추가
   const extraChefFeeNum = parseFloat(extraChefFee || '0') || 0;
   if (extraChefFeeNum > 0) {
-    content += `\n추가 셰프비: $${추가셰프비}`;
+    content += `\n추가 셰프비: ${formatCAD(추가셰프비)}`;
   }
-  content += `\n총합계: $${총합계}
+  content += `\n총합계: ${formatCAD(총합계)}
 
 ※ 금액에는 봉사료가 포함되어 있지 않습니다.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-예약 확정을 위해 **$${디파짓}**을 아래 계좌로 e-Transfer 부탁드립니다.
+예약 확정을 위해 **${formatCAD(디파짓)}**을 아래 계좌로 e-Transfer 부탁드립니다.
 ${ADMIN_EMAIL}
 입금 기한: ${deadlineDate}까지 (24시간 이내)
 

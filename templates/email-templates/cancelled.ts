@@ -37,6 +37,14 @@ export function createCancelledTemplate(
     (reservation.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
   );
 
+  // 금액 포맷팅 함수 (캐나다 달러 형식)
+  const formatCAD = (amount: number): string => {
+    return amount.toLocaleString('en-CA', {
+      style: 'currency',
+      currency: 'CAD',
+    });
+  };
+
   // 환불 금액 계산
   const depositAmount = booking.deposit_amount || 0;
   let refundAmount = 0;
@@ -72,13 +80,13 @@ export function createCancelledTemplate(
   // 관리자 취소와 고객 취소에 따른 환불 안내 문구
   const refundSection =
     cancellationType === 'admin'
-      ? `관리자 사정으로 인한 취소이므로, 입금해주신 보증금 **$${depositAmount.toFixed(
-          2
+      ? `관리자 사정으로 인한 취소이므로, 입금해주신 보증금 **${formatCAD(
+          depositAmount
         )}**을 전액 환불해드리겠습니다.\n\n환불 금액은 고객님께서 보증금을 입금하신 계좌로 **3~5영업일 내** e-Transfer를 통해 처리될 예정입니다.`
       : `취소 및 환불 정책:\n\n행사 7일 전까지 취소: 보증금 100% 환불\n행사 3일 전까지 취소: 보증금 50% 환불\n행사 3일 이내 또는 당일 취소: 환불 불가\n\n${
           refundAmount > 0
-            ? `환불 금액 **$${refundAmount.toFixed(
-                2
+            ? `환불 금액 **${formatCAD(
+                refundAmount
               )}**은 고객님께서 보증금을 입금하신 계좌로 **3~5영업일 내** e-Transfer를 통해 처리될 예정입니다.`
             : `환불 정책에 따라 이번 예약은 환불이 불가능합니다.`
         }`;

@@ -207,39 +207,65 @@ export function updateTemplateContent(
     }
   );
 
-  // 각 금액 항목을 정규식으로 찾아서 업데이트
-  updatedContent = updatedContent
-    .replace(
-      /오마카세 코스: \$[\d.]+/g,
-      `오마카세 코스: $${courseAmount || '0'}`
-    )
-    .replace(/출장비: \$[\d.]+/g, `출장비: $${travelFee || '0'}`)
-    .replace(/총합계: \$[\d.]+/g, `총합계: $${totalAmount || '0'}`)
-    // 디파짓 금액 업데이트 (두 곳: **$금액** 형식과 보증금: $금액 형식)
-    .replace(/\*\*\$[\d.]+\*\*/g, `**$${depositAmount || '0'}**`)
-    .replace(/보증금: \$[\d.]+/g, `보증금: $${depositAmount || '0'}`)
-    .replace(/잔금: \$[\d.]+/g, `잔금: $${remainingAmount || '0'}`);
+  // 금액 포맷팅 함수 (캐나다 달러 형식)
+  const formatCAD = (amount: string | number | undefined): string => {
+    const num =
+      typeof amount === 'string'
+        ? parseFloat(amount.replace(/[^0-9.]/g, '')) || 0
+        : typeof amount === 'number'
+        ? amount
+        : 0;
+    return num.toLocaleString('en-CA', { style: 'currency', currency: 'CAD' });
+  };
 
-  // 추가 셰프비 처리
+  // 각 금액 항목을 정규식으로 찾아서 업데이트 (캐나다 달러 형식 지원)
+  // formatCAD는 "$1,195.00" 형식을 생성 (CAD는 포함되지 않음)
+  // 오마카세 코스 (인원 × 가격) 형식도 지원
+  // 출장비는 추가 셰프비 처리 전에 업데이트 (줄 단위로 정확히 매칭)
+  updatedContent = updatedContent
+    .replace(/오마카세 코스[^:]*: \$[\d,.]+/g, (match) => {
+      const prefix =
+        match.match(/오마카세 코스[^:]*:/)?.[0] || '오마카세 코스:';
+      return `${prefix} ${formatCAD(courseAmount || '0')}`;
+    })
+    // 출장비는 줄 단위로 정확히 매칭 (추가 셰프비 줄과 혼동 방지)
+    .replace(/^출장비: \$[\d,.]+$/gm, `출장비: ${formatCAD(travelFee || '0')}`);
+
+  // 추가 셰프비 처리 (출장비 업데이트 후에 처리)
   const extraChefFeeNum = parseFloat(extraChefFee || '0') || 0;
   if (extraChefFeeNum > 0) {
     // 추가 셰프비 줄이 이미 있으면 업데이트
+    // "추가 셰프비:"로 시작하는 줄 전체를 찾아서 교체 (출장비와 혼동 방지)
     if (updatedContent.includes('추가 셰프비:')) {
+      // 줄 단위로 처리하여 정확히 매칭
       updatedContent = updatedContent.replace(
-        /추가 셰프비: \$[\d.]+/g,
-        `추가 셰프비: $${extraChefFee}`
+        /^추가 셰프비: .+$/gm,
+        `추가 셰프비: ${formatCAD(extraChefFee)}`
       );
     } else {
-      // 추가 셰프비 줄이 없으면 출장비 다음에 추가
+      // 추가 셰프비 줄이 없으면 출장비 다음 줄에 추가
+      // 출장비 줄만 정확히 찾아서 그 다음에 추가 (줄 단위 매칭)
       updatedContent = updatedContent.replace(
-        /(출장비: \$[\d.]+)/,
-        `$1\n추가 셰프비: $${extraChefFee}`
+        /^(출장비: \$[\d,.]+)$/gm,
+        `$1\n추가 셰프비: ${formatCAD(extraChefFee)}`
       );
     }
   } else {
-    // 추가 셰프비가 0이면 해당 줄 제거
-    updatedContent = updatedContent.replace(/추가 셰프비: \$[\d.]+\n?/g, '');
+    // 추가 셰프비가 0이면 해당 줄 제거 (줄 단위로 정확히)
+    updatedContent = updatedContent.replace(/^추가 셰프비: .+$\n?/gm, '');
   }
+
+  // 총합계 업데이트 (줄 단위로 정확히 매칭)
+  updatedContent = updatedContent.replace(
+    /^총합계: \$[\d,.]+$/gm,
+    `총합계: ${formatCAD(totalAmount || '0')}`
+  );
+
+  // 디파짓 업데이트 (**$금액** 형식)
+  updatedContent = updatedContent.replace(
+    /\*\*\$[\d,.]+\*\*/g,
+    `**${formatCAD(depositAmount || '0')}**`
+  );
 
   return updatedContent;
 }

@@ -62,9 +62,6 @@ export default function AwaitingDepositEditCard({
             onChange={(e) => onReservationTimeChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            표시: {formatTime(reservationTime)}
-          </p>
         </div>
       </>
       <hr className="border-gray-200 mb-4" />
