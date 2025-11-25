@@ -183,9 +183,9 @@ export default function SendEmailPage({ params }: PageProps) {
       );
 
       let calculatedRefund = 0;
-      if (daysUntilEvent >= 7) {
+      if (daysUntilEvent >= 14) {
         calculatedRefund = booking.deposit_amount; // 100% 환불
-      } else if (daysUntilEvent >= 3) {
+      } else if (daysUntilEvent >= 7) {
         calculatedRefund = booking.deposit_amount * 0.5; // 50% 환불
       } else {
         calculatedRefund = 0; // 환불 불가

@@ -55,9 +55,9 @@ export function createCancelledTemplate(
   } else {
     // 고객 취소: 항상 deposit_amount 기준으로 정책에 따라 계산 (입력값 무시)
     if (depositAmount > 0) {
-      if (daysUntilEvent >= 7) {
+      if (daysUntilEvent >= 14) {
         refundAmount = depositAmount; // 100% 환불
-      } else if (daysUntilEvent >= 3) {
+      } else if (daysUntilEvent >= 7) {
         refundAmount = depositAmount * 0.5; // 50% 환불
       } else {
         refundAmount = 0; // 환불 불가
@@ -83,7 +83,7 @@ export function createCancelledTemplate(
       ? `관리자 사정으로 인한 취소이므로, 입금해주신 보증금 **${formatCAD(
           depositAmount
         )}**을 전액 환불해드리겠습니다.\n\n환불 금액은 고객님께서 보증금을 입금하신 계좌로 **3~5영업일 내** e-Transfer를 통해 처리될 예정입니다.`
-      : `취소 및 환불 정책:\n\n행사 7일 전까지 취소: 보증금 100% 환불\n행사 3일 전까지 취소: 보증금 50% 환불\n행사 3일 이내 또는 당일 취소: 환불 불가\n\n${
+      : `취소 및 환불 정책:\n\n행사 2주(14일) 전까지 취소: 보증금 100% 환불\n행사 1주(7일) 전까지 취소: 보증금 50% 환불\n행사 1주 이내 또는 당일 취소: 환불 불가\n\n${
           refundAmount > 0
             ? `환불 금액 **${formatCAD(
                 refundAmount

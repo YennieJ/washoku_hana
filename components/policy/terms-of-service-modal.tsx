@@ -110,13 +110,13 @@ export default function TermsOfServiceModal({
             </p>
             <ul className="list-disc ml-4 space-y-1 text-xs">
               <li>
-                <strong>7 days or more before the event:</strong> 100% refund
+                <strong>14 days or more before the event:</strong> 100% refund
               </li>
               <li>
-                <strong>Up to 3 days before the event:</strong> 50% refund
+                <strong>Up to 7 days before the event:</strong> 50% refund
               </li>
               <li>
-                <strong>Within 3 days or on the day of the event:</strong> No
+                <strong>Within 7 days or on the day of the event:</strong> No
                 refund (0%)
               </li>
             </ul>
