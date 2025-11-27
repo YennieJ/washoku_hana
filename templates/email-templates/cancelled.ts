@@ -4,7 +4,6 @@ import {
   formatTime,
   getEmailSignature,
 } from '@/utils/email-utils';
-import { ADMIN_EMAIL } from '@/constants/email';
 
 export function createCancelledTemplate(
   data: EmailTemplateData
@@ -18,15 +17,15 @@ export function createCancelledTemplate(
   } = data;
 
   const bookingDate = new Date(reservationDate || booking.booking_date);
-  const formattedDate = bookingDate.toLocaleDateString('ko-KR', {
+  const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
-  const dayName = bookingDate.toLocaleDateString('ko-KR', {
+  const dayName = bookingDate.toLocaleDateString('en-CA', {
     weekday: 'long',
   });
-  const 시간 = formatTime(reservationTime || '19:00');
+  const time = formatTime(reservationTime || '19:00');
 
   // 오늘 날짜와 예약 날짜의 차이 계산 (일 단위)
   const today = new Date();
@@ -77,38 +76,38 @@ export function createCancelledTemplate(
   // 취소 주체에 따른 인사말 및 취소 문구
   const cancellationIntro =
     cancellationType === 'admin'
-      ? `${formattedDate} (${dayName}) ${시간} 예약을 취소하게 되어 깊이 사과드립니다.\n\n저희 사정으로 인해 예약을 진행할 수 없게 되어 예약을 취소하게 되었습니다.`
+      ? `We sincerely apologize for having to cancel your reservation for ${formattedDate} (${dayName}) ${time}.\n\nDue to circumstances on our end, we are unable to proceed with this reservation and must cancel it.`
       : cancellationType === 'customer_no_deposit'
-      ? `${formattedDate} (${dayName}) ${시간} 예약 취소 요청을 확인하였습니다.\n\n예약은 공식적으로 취소되었습니다.`
-      : `${formattedDate} (${dayName}) ${시간} 예약 취소 요청을 확인하였습니다.\n\n예약은 공식적으로 취소되었으며, 확인 메일에 명시된 환불 정책에 따라 아래와 같이 진행됩니다.`;
+      ? `We have received your cancellation request for the reservation on ${formattedDate} (${dayName}) ${time}.\n\nYour reservation has been officially cancelled.`
+      : `We have received your cancellation request for the reservation on ${formattedDate} (${dayName}) ${time}.\n\nYour reservation has been officially cancelled, and we will proceed according to the refund policy outlined in your confirmation email.`;
 
   // 관리자 취소와 고객 취소에 따른 환불 안내 문구
   const refundSection =
     cancellationType === 'admin'
-      ? `관리자 사정으로 인한 취소이므로, 입금해주신 보증금 **${formatCAD(
+      ? `As this cancellation is due to circumstances on our end, we will provide a full refund of your deposit of **${formatCAD(
           depositAmount
-        )}**을 전액 환불해드리겠습니다.\n\n환불 금액은 고객님께서 보증금을 입금하신 계좌로 **3~5영업일 내** e-Transfer를 통해 처리될 예정입니다.`
+        )}**.\n\nThe refund will be processed via e-Transfer to the account from which you sent the deposit within **3-5 business days**.`
       : cancellationType === 'customer_no_deposit'
-      ? `입금 전 취소이므로 환불이 필요하지 않습니다.`
-      : `취소 및 환불 정책:\n\n행사 2주(14일) 전까지 취소: 보증금 100% 환불\n행사 1주(7일) 전까지 취소: 보증금 50% 환불\n행사 1주 이내 또는 당일 취소: 환불 불가\n\n${
+      ? `Since this cancellation occurred before the deposit was received, no refund is required.`
+      : `Cancellation and Refund Policy:\n\nCancellation 2 weeks (14 days) or more before the event: 100% deposit refund\nCancellation 1 week (7 days) before the event: 50% deposit refund\nCancellation within 1 week or on the day of the event: No refund\n\n${
           refundAmount > 0
-            ? `환불 금액 **${formatCAD(
+            ? `Your refund of **${formatCAD(
                 refundAmount
-              )}**은 고객님께서 보증금을 입금하신 계좌로 **3~5영업일 내** e-Transfer를 통해 처리될 예정입니다.`
-            : `환불 정책에 따라 이번 예약은 환불이 불가능합니다.`
+              )}** will be processed via e-Transfer to the account from which you sent the deposit within **3-5 business days**.`
+            : `According to our refund policy, this reservation is not eligible for a refund.`
         }`;
 
   const closingMessage =
     cancellationType === 'admin'
-      ? '이번에는 모시지 못해 정말 죄송합니다. 다음 기회에 더 나은 서비스로 보답하겠습니다.'
+      ? 'We sincerely apologize for not being able to serve you this time. We hope to provide you with better service on another occasion.'
       : cancellationType === 'customer_no_deposit'
-      ? '다음 기회에 다시 만나 뵙길 바랍니다.'
-      : '이번에는 모시지 못해 아쉽지만, 다음 기회에 다시 만나 뵙길 바랍니다.';
+      ? 'We hope to see you again in the future.'
+      : 'We are sorry we could not serve you this time, but we hope to see you again in the future.';
 
   // 입금 전 취소의 경우 환불 섹션을 별도로 처리
   const content =
     cancellationType === 'customer_no_deposit'
-      ? `안녕하세요 ${booking.customer_name}님,
+      ? `Hello ${booking.customer_name},
 
 ${cancellationIntro}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -120,7 +119,7 @@ ${refundSection}
 ${closingMessage}
 
 ${getEmailSignature()}`
-      : `안녕하세요 ${booking.customer_name}님,
+      : `Hello ${booking.customer_name},
 
 ${cancellationIntro}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -135,8 +134,8 @@ ${getEmailSignature()}`;
 
   const subject =
     cancellationType === 'customer_no_deposit'
-      ? `Washoku Hana 예약 취소 (${formattedDate})`
-      : `Washoku Hana 예약 취소 (${formattedDate}) 및 환불 안내`;
+      ? `Washoku Hana Reservation Cancelled (${formattedDate})`
+      : `Washoku Hana Reservation Cancelled (${formattedDate}) and Refund Information`;
 
   return { subject, content };
 }

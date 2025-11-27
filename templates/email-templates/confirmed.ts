@@ -23,9 +23,9 @@ export function createConfirmedTemplate(
     return num.toLocaleString('en-CA', { style: 'currency', currency: 'CAD' });
   };
 
-  const 총금액 = parseFloat(totalAmount || '0');
-  const 보증금 = parseFloat(depositAmount || '0');
-  const 잔금 = parseFloat(remainingAmount || '0');
+  const totalPrice = parseFloat(totalAmount || '0');
+  const deposit = parseFloat(depositAmount || '0');
+  const remaining = parseFloat(remainingAmount || '0');
 
   // 8명 이상 여부 확인
   const isLargeGroup = booking.guest_count >= 8;
@@ -49,15 +49,15 @@ export function createConfirmedTemplate(
   );
 
   const bookingDate = new Date(reservationDate || booking.booking_date);
-  const formattedDate = bookingDate.toLocaleDateString('ko-KR', {
+  const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
-  const dayName = bookingDate.toLocaleDateString('ko-KR', {
+  const dayName = bookingDate.toLocaleDateString('en-CA', {
     weekday: 'long',
   });
-  const 시간 = formatTime(reservationTime || '19:00');
+  const time = formatTime(reservationTime || '19:00');
 
   const bookingInfoSection = formatBookingInfoSection(
     booking,
@@ -65,46 +65,46 @@ export function createConfirmedTemplate(
     reservationDate
   );
 
-  const content = `안녕하세요 ${booking.customer_name}님,
+  const content = `Hello ${booking.customer_name},
 
-Washoku Hana의 예약이 확정되었습니다.
-소중한 자리에 저희를 초대해 주셔서 감사드리며, 잊지 못할 오마카세 경험을 준비하겠습니다.
+Your reservation with Washoku Hana has been confirmed.
+Thank you for inviting us to your special occasion. We look forward to providing you with an unforgettable omakase experience.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-금액 안내:
-총 금액: ${formatCAD(총금액)}
-보증금 입금 확인: ${formatCAD(보증금)}
-잔금: ${formatCAD(
-    잔금
-  )} (잔금 결제는 서비스 당일, 셰프 도착 후 현장에서 **현금 또는 계좌이체**로 가능합니다.)
+Payment Information:
+Total Amount: ${formatCAD(totalPrice)}
+Deposit Received: ${formatCAD(deposit)}
+Remaining Balance: ${formatCAD(
+    remaining
+  )} (The remaining balance can be paid on the day of service, after the chef arrives, by **cash or e-Transfer**.)
 
-셰프 도착 시간: ${chefArrivalTime}
+Chef Arrival Time: ${chefArrivalTime}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-취소 및 환불 정책:
-행사 2주(14일) 전까지 취소: 보증금 100% 환불
-행사 1주(7일) 전까지 취소: 보증금 50% 환불
-행사 1주 이내 또는 당일 취소: 환불 불가
+Cancellation and Refund Policy:
+Cancellation 2 weeks (14 days) or more before the event: 100% deposit refund
+Cancellation 1 week (7 days) before the event: 50% deposit refund
+Cancellation within 1 week or on the day of the event: No refund
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-호스트가 준비하실 것:
-원활한 서비스 진행을 위해 아래 항목을 미리 준비해 주세요.
+What the Host Should Prepare:
+To ensure a smooth service, please have the following items ready in advance.
 
-**[필수 항목]**
-식사 공간 및 테이블
-게스트용 냅킨
-음료 (물, 차, 주류 등 원하시는 종류)
+**[Required Items]**
+Dining space and table
+Napkins for guests
+Beverages (water, tea, alcohol, or any preferred drinks)
 
-**[선택 항목]**
-테이블 세팅 또는 식기류
+**[Optional Items]**
+Table setting or dinnerware
 
-오마카세 진행에 필요한 모든 조리도구 및 플레이팅 장비는 셰프가 직접 준비합니다.
+All cooking tools and plating equipment required for the omakase service will be prepared by the chef.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-곧 고객님과 게스트분들께 잊지 못할 오마카세 경험을 선사하겠습니다.
+We look forward to providing you and your guests with an unforgettable omakase experience.
 
 ${getEmailSignature()}`;
 
-  const subject = `Washoku Hana 예약 확정 안내 – ${formattedDate} (${dayName}) ${시간}`;
+  const subject = `Washoku Hana Reservation Confirmed – ${formattedDate} (${dayName}) ${time}`;
 
   return { subject, content };
 }

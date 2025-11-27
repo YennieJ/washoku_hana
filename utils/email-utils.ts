@@ -3,9 +3,9 @@ import { ADMIN_EMAIL } from '@/constants/email';
 
 // 이메일 템플릿 공통 서명
 export function getEmailSignature(): string {
-  return `감사합니다.
+  return `Warm regards,
 
-문의 이메일: ${ADMIN_EMAIL}
+Contact Email: ${ADMIN_EMAIL}
 Chef Minho
 Washoku Hana – Private Omakase Experience`;
 }
@@ -31,23 +31,23 @@ export function formatBookingInfoSection(
 ): string {
   // 날짜가 전달되면 사용, 아니면 booking.booking_date 사용
   const bookingDate = new Date(reservationDate || booking.booking_date);
-  const formattedDate = bookingDate.toLocaleDateString('ko-KR', {
+  const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
-  const dayName = bookingDate.toLocaleDateString('ko-KR', {
+  const dayName = bookingDate.toLocaleDateString('en-CA', {
     weekday: 'long',
   });
-  const 시간 = formatTime(reservationTime || '19:00');
+  const time = formatTime(reservationTime || '19:00');
 
-  return `예약 정보:
-예약 번호: ${booking.booking_number}
-예약 날짜: ${formattedDate} (${dayName}) ${시간}
-메뉴: ${booking.menu}
-게스트 수: ${booking.guest_count}명
-연락처: ${booking.customer_phone}
-서비스 주소: ${booking.address}
-식품 알레르기: ${booking.food_allergy}
-특별 요청: ${booking.special_requests}`;
+  return `Booking Information:
+Booking Number: ${booking.booking_number}
+Reservation Date: ${formattedDate} (${dayName}) ${time}
+Menu: ${booking.menu}
+Number of Guests: ${booking.guest_count}
+Contact: ${booking.customer_phone}
+Service Address: ${booking.address}
+Food Allergies: ${booking.food_allergy || 'None'}
+Special Requests: ${booking.special_requests || 'None'}`;
 }

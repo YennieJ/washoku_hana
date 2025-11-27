@@ -26,7 +26,7 @@ export default function BookingCalendar({
           setUnavailableDates(new Set(data.unavailableDates || []));
         }
       } catch (error) {
-        console.error('예약 불가능한 날짜 조회 실패:', error);
+        console.error('Failed to fetch unavailable dates:', error);
       }
     };
 

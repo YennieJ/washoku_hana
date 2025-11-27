@@ -38,53 +38,53 @@ export async function POST(request: NextRequest) {
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           
-          <h2 style="margin: 0 0 20px 0;">예약 요청 완료</h2>
+          <h2 style="margin: 0 0 20px 0;">Reservation Request Received</h2>
 
-          <p>안녕하세요 ${formData.name}님,</p>
+          <p>Hello ${formData.name},</p>
           
-          <p>Washoku Hana를 예약해주셔서 진심으로 감사드립니다.<br>
-          귀하께서 요청하신 예약 내용을 확인해드립니다.</p>
+          <p>Thank you for your reservation request with Washoku Hana.<br>
+          We have received your booking details as follows:</p>
 
           <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
 
-          <p><strong>예약 번호:</strong> ${bookingNumber}</p>
-          <p><strong>예약 날짜:</strong> ${selectedDate} (${selectedDayName}) 오후 7시</p>
-          <p><strong>메뉴:</strong> ${formData.menu} - ${menuPrice}</p>
-          <p><strong>게스트 수:</strong> ${formData.guestCount}명</p>
-          <p><strong>연락처:</strong> ${formData.phone}</p>
-          <p><strong>서비스 주소:</strong> ${formData.address}</p>
+          <p><strong>Booking Number:</strong> ${bookingNumber}</p>
+          <p><strong>Reservation Date:</strong> ${selectedDate} (${selectedDayName}) 7:00 PM</p>
+          <p><strong>Menu:</strong> ${formData.menu} - ${menuPrice}</p>
+          <p><strong>Number of Guests:</strong> ${formData.guestCount}</p>
+          <p><strong>Contact:</strong> ${formData.phone}</p>
+          <p><strong>Service Address:</strong> ${formData.address}</p>
 
           ${
             formData.foodAllergy
-              ? `<p><strong>음식 알레르기:</strong> ${formData.foodAllergy}</p>`
+              ? `<p><strong>Food Allergies:</strong> ${formData.foodAllergy}</p>`
               : ''
           }
           ${
             formData.requests
-              ? `<p><strong>특별 요청사항:</strong> ${formData.requests}</p>`
+              ? `<p><strong>Special Requests:</strong> ${formData.requests}</p>`
               : ''
           }
 
           <hr style="border: none; border-top: 2px solid #333; margin: 30px 0;">
 
-          <h3 style="margin: 0 0 15px 0; font-size: 18px;">다음 단계 안내</h3>
+          <h3 style="margin: 0 0 15px 0; font-size: 18px;">Next Steps</h3>
           
           <p style="margin: 0 0 15px 0; line-height: 1.8;">
-            현재 예약은 요청 상태입니다. 담당자가 곧 예약 내용을 확인하고 검토한 후, 예약 확정을 위한 디파짓(deposit) 안내 메일을 보내드리겠습니다.
+            Your reservation is currently pending. Our team will review your booking details and send you a deposit payment email to confirm your reservation.
           </p>
           
           <p style="margin: 0; line-height: 1.8;">
-            예약 확정 및 디파짓 안내는 보통 24시간 이내에 발송됩니다. 양해 부탁드립니다.
+            You can expect to receive the confirmation and deposit information email within 24 hours. Thank you for your patience.
           </p>
 
           <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
 
           <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">
-            감사합니다.
+            Warm regards,
           </p>
 
           <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">
-            이메일: ${ADMIN_EMAIL}
+            Email: ${ADMIN_EMAIL}
           </p>
 
           <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: 'Washoku Hana <noreply@washokuhana.ca>',
       to: formData.email, // 고객에게 전송
-      subject: `[Washoku Hana] ${formData.name}님 예약 확인 - ${selectedDate}`,
+      subject: `[Washoku Hana] Reservation Confirmation for ${formData.name} – ${selectedDate}`,
       html: emailHtml,
       replyTo: ADMIN_EMAIL, // 답장 주소 추가 (스팸 점수 감소)
     });

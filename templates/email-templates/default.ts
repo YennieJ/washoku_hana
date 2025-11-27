@@ -4,13 +4,13 @@ export function createDefaultTemplate(data: EmailTemplateData): EmailTemplate {
   const { booking } = data;
 
   const bookingDate = new Date(booking.booking_date);
-  const formattedDate = bookingDate.toLocaleDateString('ko-KR', {
+  const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
 
-  const subject = `${booking.customer_name}님 예약 - ${formattedDate}`;
+  const subject = `Reservation for ${booking.customer_name} – ${formattedDate}`;
   const content = '';
 
   return { subject, content };

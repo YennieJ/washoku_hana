@@ -9,7 +9,7 @@ export function createDeclinedTemplate(data: EmailTemplateData): EmailTemplate {
   const { booking, reservationTime, reservationDate } = data;
 
   const bookingDate = new Date(reservationDate || booking.booking_date);
-  const formattedDate = bookingDate.toLocaleDateString('ko-KR', {
+  const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -22,23 +22,23 @@ export function createDeclinedTemplate(data: EmailTemplateData): EmailTemplate {
   );
 
   // 거절 사유 (입력값이 있으면 사용, 없으면 플레이스홀더)
-  const 거절사유 =
+  const declineReason =
     data.declineReason ||
     '[이유 예시: 일정상 불가능 / 이동 거리 문제 / 준비 시간 부족 등]';
 
-  const content = `안녕하세요 ${booking.customer_name}님,
+  const content = `Hello ${booking.customer_name},
 
-Washoku Hana에 관심을 가져주셔서 감사합니다.
-죄송하지만, **${거절사유}**으로 인해 해당 일정에 진행이 어렵습니다.
+Thank you for your interest in Washoku Hana.
+We apologize, but due to **${declineReason}**, we are unable to proceed with this reservation.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-소중한 자리에 함께하지 못해 아쉽지만, 다음에 더 좋은 기회에 찾아뵐 수 있기를 바랍니다.
+We are sorry we cannot join you on this occasion, but we hope to have the opportunity to serve you in the future.
 
 ${getEmailSignature()}`;
 
-  const subject = `Washoku Hana 예약 요청에 대한 안내 - ${formattedDate}`;
+  const subject = `Washoku Hana Reservation Request Update - ${formattedDate}`;
 
   return { subject, content };
 }

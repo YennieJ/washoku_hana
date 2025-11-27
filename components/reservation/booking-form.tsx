@@ -99,7 +99,7 @@ export default function BookingForm({
         guest_count: Number(formData.guestCount),
         menu: formData.menu,
         address: formData.address,
-        food_allergy: formData.foodAllergy || '없음',
+        food_allergy: formData.foodAllergy || 'None',
         special_requests: formData.requests || null,
       });
 
