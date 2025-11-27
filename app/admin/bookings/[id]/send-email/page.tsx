@@ -82,7 +82,7 @@ export default function SendEmailPage({ params }: PageProps) {
 
   // CANCELLED용 취소 타입 상태 (기본값: 고객 취소)
   const [cancellationType, setCancellationType] = useState<
-    'admin' | 'customer'
+    'admin' | 'customer' | 'customer_no_deposit'
   >('customer');
 
   // booking 로드 시 날짜 및 환불 금액 초기화
@@ -168,9 +168,10 @@ export default function SendEmailPage({ params }: PageProps) {
   useEffect(() => {
     if (!booking || !reservationDate) return;
 
-    // CANCELLED 선택 시 환불 금액 자동 계산
+    // CANCELLED 선택 시 환불 금액 자동 계산 (입금 전 취소가 아닌 경우만)
     if (
       selectedMailType === 'CANCELLED' &&
+      cancellationType !== 'customer_no_deposit' &&
       !refundAmount &&
       booking.deposit_amount
     ) {
@@ -194,6 +195,12 @@ export default function SendEmailPage({ params }: PageProps) {
       if (calculatedRefund > 0 || booking.refund_amount) {
         setRefundAmount((booking.refund_amount || calculatedRefund).toString());
       }
+    } else if (
+      selectedMailType === 'CANCELLED' &&
+      cancellationType === 'customer_no_deposit'
+    ) {
+      // 입금 전 취소인 경우 환불 금액을 0으로 설정
+      setRefundAmount('0');
     }
 
     // 예약 확정 템플릿의 경우, booking 객체의 값만 사용 (입력 필드 사용 안 함)

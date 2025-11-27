@@ -52,8 +52,11 @@ export function createCancelledTemplate(
   if (cancellationType === 'admin') {
     // 관리자 취소: 항상 실제 입금받은 보증금(deposit_amount) 사용
     refundAmount = depositAmount;
+  } else if (cancellationType === 'customer_no_deposit') {
+    // 입금 전 고객 취소: 환불 금액 없음
+    refundAmount = 0;
   } else {
-    // 고객 취소: 항상 deposit_amount 기준으로 정책에 따라 계산 (입력값 무시)
+    // 고객 취소 (입금 후): 항상 deposit_amount 기준으로 정책에 따라 계산 (입력값 무시)
     if (depositAmount > 0) {
       if (daysUntilEvent >= 14) {
         refundAmount = depositAmount; // 100% 환불
@@ -75,6 +78,8 @@ export function createCancelledTemplate(
   const cancellationIntro =
     cancellationType === 'admin'
       ? `${formattedDate} (${dayName}) ${시간} 예약을 취소하게 되어 깊이 사과드립니다.\n\n저희 사정으로 인해 예약을 진행할 수 없게 되어 예약을 취소하게 되었습니다.`
+      : cancellationType === 'customer_no_deposit'
+      ? `${formattedDate} (${dayName}) ${시간} 예약 취소 요청을 확인하였습니다.\n\n예약은 공식적으로 취소되었습니다.`
       : `${formattedDate} (${dayName}) ${시간} 예약 취소 요청을 확인하였습니다.\n\n예약은 공식적으로 취소되었으며, 확인 메일에 명시된 환불 정책에 따라 아래와 같이 진행됩니다.`;
 
   // 관리자 취소와 고객 취소에 따른 환불 안내 문구
@@ -83,6 +88,8 @@ export function createCancelledTemplate(
       ? `관리자 사정으로 인한 취소이므로, 입금해주신 보증금 **${formatCAD(
           depositAmount
         )}**을 전액 환불해드리겠습니다.\n\n환불 금액은 고객님께서 보증금을 입금하신 계좌로 **3~5영업일 내** e-Transfer를 통해 처리될 예정입니다.`
+      : cancellationType === 'customer_no_deposit'
+      ? `입금 전 취소이므로 환불이 필요하지 않습니다.`
       : `취소 및 환불 정책:\n\n행사 2주(14일) 전까지 취소: 보증금 100% 환불\n행사 1주(7일) 전까지 취소: 보증금 50% 환불\n행사 1주 이내 또는 당일 취소: 환불 불가\n\n${
           refundAmount > 0
             ? `환불 금액 **${formatCAD(
@@ -94,9 +101,26 @@ export function createCancelledTemplate(
   const closingMessage =
     cancellationType === 'admin'
       ? '이번에는 모시지 못해 정말 죄송합니다. 다음 기회에 더 나은 서비스로 보답하겠습니다.'
+      : cancellationType === 'customer_no_deposit'
+      ? '다음 기회에 다시 만나 뵙길 바랍니다.'
       : '이번에는 모시지 못해 아쉽지만, 다음 기회에 다시 만나 뵙길 바랍니다.';
 
-  const content = `안녕하세요 ${booking.customer_name}님,
+  // 입금 전 취소의 경우 환불 섹션을 별도로 처리
+  const content =
+    cancellationType === 'customer_no_deposit'
+      ? `안녕하세요 ${booking.customer_name}님,
+
+${cancellationIntro}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+${bookingInfoSection}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${refundSection}
+
+${closingMessage}
+
+${getEmailSignature()}`
+      : `안녕하세요 ${booking.customer_name}님,
 
 ${cancellationIntro}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -109,7 +133,10 @@ ${closingMessage}
 
 ${getEmailSignature()}`;
 
-  const subject = `Washoku Hana 예약 취소 (${formattedDate}) 및 환불 안내`;
+  const subject =
+    cancellationType === 'customer_no_deposit'
+      ? `Washoku Hana 예약 취소 (${formattedDate})`
+      : `Washoku Hana 예약 취소 (${formattedDate}) 및 환불 안내`;
 
   return { subject, content };
 }

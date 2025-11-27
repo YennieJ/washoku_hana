@@ -22,7 +22,7 @@ export interface EmailTemplateData {
   reason?: string; // PENDING_UPDATE용: 변경 사유
   changeProposal?: string; // PENDING_UPDATE용: 변경 제안
   declineReason?: string; // DECLINED용: 거절 사유
-  cancellationType?: 'admin' | 'customer'; // CANCELLED용: 취소 주체 (관리자/고객)
+  cancellationType?: 'admin' | 'customer' | 'customer_no_deposit'; // CANCELLED용: 취소 주체 (관리자/고객/입금 전 고객 취소)
 }
 
 export interface EmailTemplate {

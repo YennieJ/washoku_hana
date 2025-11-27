@@ -25,8 +25,10 @@ export interface EditCardProps {
   // CANCELLED
   refundAmount?: string;
   onRefundAmountChange?: (value: string) => void;
-  cancellationType?: 'admin' | 'customer';
-  onCancellationTypeChange?: (value: 'admin' | 'customer') => void;
+  cancellationType?: 'admin' | 'customer' | 'customer_no_deposit';
+  onCancellationTypeChange?: (
+    value: 'admin' | 'customer' | 'customer_no_deposit'
+  ) => void;
 
   // PENDING_UPDATE
   reason?: string;
