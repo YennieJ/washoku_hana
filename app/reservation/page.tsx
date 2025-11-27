@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navigation from '@/components/navigation';
 import BookingCalendar from '@/components/reservation/booking-calendar';
 import BookingForm from '@/components/reservation/booking-form';
 import Footer from '@/components/footer';
 
-export default function ReservationPage() {
+// useSearchParams를 사용하는 부분을 별도 컴포넌트로 분리
+function ReservationContent() {
   const searchParams = useSearchParams();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDayName, setSelectedDayName] = useState('');
@@ -181,5 +182,19 @@ export default function ReservationPage() {
       </div>
       <Footer />
     </div>
+  );
+}
+
+export default function ReservationPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen text-white flex items-center justify-center">
+          <div className="text-primary">Loading page...</div>
+        </div>
+      }
+    >
+      <ReservationContent />
+    </Suspense>
   );
 }
