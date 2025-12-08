@@ -164,44 +164,50 @@ export default function SendEmailPage({ params }: PageProps) {
     return (total - deposit).toFixed(2);
   }, [totalAmount, depositAmount]);
 
+  // 취소 타입 또는 메일 종류 변경 시 환불 금액을 디폴트 값으로 초기화
+  useEffect(() => {
+    if (!booking || selectedMailType !== 'CANCELLED') return;
+
+    if (cancellationType === 'admin') {
+      // 관리자 취소: 전액 환불 (deposit_amount)
+      if (booking.deposit_amount) {
+        setRefundAmount(booking.deposit_amount.toString());
+      } else {
+        setRefundAmount('0');
+      }
+    } else if (cancellationType === 'customer_no_deposit') {
+      // 고객 취소 (입금 전): 환불 금액 없음
+      setRefundAmount('0');
+    } else {
+      // 고객 취소 (입금 후): 정책에 따라 계산
+      if (booking.deposit_amount && reservationDate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const reservation = new Date(reservationDate);
+        reservation.setHours(0, 0, 0, 0);
+        const daysUntilEvent = Math.floor(
+          (reservation.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
+
+        let calculatedRefund = 0;
+        if (daysUntilEvent >= 14) {
+          calculatedRefund = booking.deposit_amount; // 100% 환불
+        } else if (daysUntilEvent >= 7) {
+          calculatedRefund = booking.deposit_amount * 0.5; // 50% 환불
+        } else {
+          calculatedRefund = 0; // 환불 불가
+        }
+
+        setRefundAmount(calculatedRefund.toString());
+      } else {
+        setRefundAmount('0');
+      }
+    }
+  }, [cancellationType, booking, selectedMailType, reservationDate]);
+
   // 메일 종류 또는 날짜 변경 시 템플릿 로드 (초기 렌더링 포함)
   useEffect(() => {
     if (!booking || !reservationDate) return;
-
-    // CANCELLED 선택 시 환불 금액 자동 계산 (입금 전 취소가 아닌 경우만)
-    if (
-      selectedMailType === 'CANCELLED' &&
-      cancellationType !== 'customer_no_deposit' &&
-      !refundAmount &&
-      booking.deposit_amount
-    ) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const reservation = new Date(reservationDate);
-      reservation.setHours(0, 0, 0, 0);
-      const daysUntilEvent = Math.floor(
-        (reservation.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-      );
-
-      let calculatedRefund = 0;
-      if (daysUntilEvent >= 14) {
-        calculatedRefund = booking.deposit_amount; // 100% 환불
-      } else if (daysUntilEvent >= 7) {
-        calculatedRefund = booking.deposit_amount * 0.5; // 50% 환불
-      } else {
-        calculatedRefund = 0; // 환불 불가
-      }
-
-      if (calculatedRefund > 0 || booking.refund_amount) {
-        setRefundAmount((booking.refund_amount || calculatedRefund).toString());
-      }
-    } else if (
-      selectedMailType === 'CANCELLED' &&
-      cancellationType === 'customer_no_deposit'
-    ) {
-      // 입금 전 취소인 경우 환불 금액을 0으로 설정
-      setRefundAmount('0');
-    }
 
     // 예약 확정 템플릿의 경우, booking 객체의 값만 사용 (입력 필드 사용 안 함)
     const templateData = {

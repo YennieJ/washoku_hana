@@ -44,18 +44,18 @@ export function createCancelledTemplate(
     });
   };
 
-  // 환불 금액 계산
+  // 환불 금액 계산 (항상 디폴트 값으로 계산)
   const depositAmount = booking.deposit_amount || 0;
   let refundAmount = 0;
 
   if (cancellationType === 'admin') {
-    // 관리자 취소: 항상 실제 입금받은 보증금(deposit_amount) 사용
+    // 관리자 취소: 항상 실제 입금받은 보증금(deposit_amount) 사용 (전액 환불)
     refundAmount = depositAmount;
   } else if (cancellationType === 'customer_no_deposit') {
     // 입금 전 고객 취소: 환불 금액 없음
     refundAmount = 0;
   } else {
-    // 고객 취소 (입금 후): 항상 deposit_amount 기준으로 정책에 따라 계산 (입력값 무시)
+    // 고객 취소 (입금 후): deposit_amount 기준으로 정책에 따라 계산
     if (depositAmount > 0) {
       if (daysUntilEvent >= 14) {
         refundAmount = depositAmount; // 100% 환불
@@ -82,10 +82,11 @@ export function createCancelledTemplate(
       : `We have received your cancellation request for the reservation on ${formattedDate} (${dayName}) ${time}.\n\nYour reservation has been officially cancelled, and we will proceed according to the refund policy outlined in your confirmation email.`;
 
   // 관리자 취소와 고객 취소에 따른 환불 안내 문구
+  // refundAmount는 이미 계산된 값 (관리자 취소: depositAmount, 고객 취소: 정책에 따라 계산)
   const refundSection =
     cancellationType === 'admin'
       ? `As this cancellation is due to circumstances on our end, we will provide a full refund of your deposit of **${formatCAD(
-          depositAmount
+          refundAmount
         )}**.\n\nThe refund will be processed via e-Transfer to the account from which you sent the deposit within **3-5 business days**.`
       : cancellationType === 'customer_no_deposit'
       ? `Since this cancellation occurred before the deposit was received, no refund is required.`

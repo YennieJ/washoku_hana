@@ -41,12 +41,14 @@ export function updateTemplateContent(
   if (templateType === 'PENDING_UPDATE') {
     // 시간 업데이트
     const 시간 = formatTime(reservationTime || '19:00');
+
+    // 영어 템플릿: "Reservation Date: ..." 형식
     updatedContent = updatedContent.replace(
-      /📅 날짜 및 시간: .+? \(.*?\) \d+:\d+ (AM|PM)/g,
+      /Reservation Date: .+? \(.*?\) \d+:\d+ (AM|PM)/g,
       (match) => {
         const dateAndDay =
-          match.match(/📅 날짜 및 시간: (.+? \(.*?\))/)?.[1] || '';
-        return `📅 날짜 및 시간: ${dateAndDay} ${시간}`;
+          match.match(/Reservation Date: (.+? \(.*?\))/)?.[1] || '';
+        return `Reservation Date: ${dateAndDay} ${시간}`;
       }
     );
 
@@ -56,27 +58,12 @@ export function updateTemplateContent(
       const defaultReason = '[사유 예시: 셰프 일정 / 이동 거리 / 준비 시간 등]';
       const finalReason = reason || defaultReason;
 
-      // 플레이스홀더 형식: [사유 예시: ...]
-      if (updatedContent.includes('[사유 예시:')) {
+      // 영어 템플릿: "Due to **${reason}**" 형식
+      if (updatedContent.includes('Due to **')) {
         updatedContent = updatedContent.replace(
-          /\[사유 예시: .+?\]/g,
-          finalReason
+          /Due to \*\*[^*]+\*\*/g,
+          `Due to **${finalReason}**`
         );
-      } else {
-        // 이미 값이 들어간 경우: "사유내용으로 인해 아래와 같이..." 형식에서 사유 부분만 교체
-        // "으로 인해 아래와 같이 변경이 가능한지 확인 부탁드립니다." 앞의 모든 내용을 사유로 간주
-        const lines = updatedContent.split('\n');
-        const updatedLines = lines.map((line) => {
-          if (
-            line.includes(
-              '으로 인해 아래와 같이 변경이 가능한지 확인 부탁드립니다.'
-            )
-          ) {
-            return `${finalReason}으로 인해 아래와 같이 변경이 가능한지 확인 부탁드립니다.`;
-          }
-          return line;
-        });
-        updatedContent = updatedLines.join('\n');
       }
     }
 
@@ -87,23 +74,12 @@ export function updateTemplateContent(
         '[변경 제안 – 예: 시간 7:30pm으로 조정 / 날짜를 12월 21일로 변경 / 인원 10명으로 조정 등]';
       const finalChangeProposal = changeProposal || defaultChangeProposal;
 
-      // 플레이스홀더 형식: 👉 [변경 제안 ...]
-      if (updatedContent.includes('[변경 제안')) {
+      // 영어 템플릿: "👉 **${changeProposal}**" 형식
+      if (updatedContent.includes('👉 **')) {
         updatedContent = updatedContent.replace(
-          /👉 \[변경 제안[^\]]+\]/g,
-          `👉 ${finalChangeProposal}`
+          /👉 \*\*[^*]+\*\*/g,
+          `👉 **${finalChangeProposal}**`
         );
-      } else {
-        // 이미 값이 들어간 경우: "👉 변경제안내용" 형식에서 변경제안 부분만 교체
-        // "👉 "로 시작하는 줄 전체를 찾아서 교체
-        const lines = updatedContent.split('\n');
-        const updatedLines = lines.map((line) => {
-          if (line.trim().startsWith('👉')) {
-            return `👉 ${finalChangeProposal}`;
-          }
-          return line;
-        });
-        updatedContent = updatedLines.join('\n');
       }
     }
 
@@ -119,25 +95,12 @@ export function updateTemplateContent(
         '[이유 예시: 일정상 불가능 / 이동 거리 문제 / 준비 시간 부족 등]';
       const finalDeclineReason = declineReason || defaultDeclineReason;
 
-      // 플레이스홀더 형식: [이유 예시: ...]
-      if (updatedContent.includes('[이유 예시:')) {
+      // 영어 템플릿: "due to **${declineReason}**" 형식
+      if (updatedContent.includes('due to **')) {
         updatedContent = updatedContent.replace(
-          /\[이유 예시: .+?\]/g,
-          finalDeclineReason
+          /due to \*\*[^*]+\*\*/g,
+          `due to **${finalDeclineReason}**`
         );
-      } else {
-        // 이미 값이 들어간 경우: "죄송하지만, 이유내용 진행이 어렵습니다." 형식에서 이유 부분만 교체
-        const lines = updatedContent.split('\n');
-        const updatedLines = lines.map((line) => {
-          if (
-            line.includes('죄송하지만,') &&
-            line.includes('진행이 어렵습니다.')
-          ) {
-            return `죄송하지만, ${finalDeclineReason} 진행이 어렵습니다.`;
-          }
-          return line;
-        });
-        updatedContent = updatedLines.join('\n');
       }
     }
 
@@ -148,23 +111,45 @@ export function updateTemplateContent(
   if (templateType === 'CONFIRMED') {
     // formatBookingInfoSection 형식에 맞게 날짜 및 시간 업데이트
     const 시간 = formatTime(reservationTime || '19:00');
+
+    // 영어 템플릿: "Reservation Date: ..." 형식
     updatedContent = updatedContent.replace(
-      /예약 날짜: .+? \(.*?\) \d+:\d+ (AM|PM)/g,
+      /Reservation Date: .+? \(.*?\) \d+:\d+ (AM|PM)/g,
       (match) => {
-        // 날짜와 요일 부분은 유지하고 시간만 변경
-        const dateAndDay = match.match(/예약 날짜: (.+? \(.*?\))/)?.[1] || '';
-        return `예약 날짜: ${dateAndDay} ${시간}`;
+        const dateAndDay =
+          match.match(/Reservation Date: (.+? \(.*?\))/)?.[1] || '';
+        return `Reservation Date: ${dateAndDay} ${시간}`;
       }
     );
 
-    // 금액 업데이트
+    // 금액 포맷팅 함수
+    const formatCAD = (amount: string | number | undefined): string => {
+      const num =
+        typeof amount === 'string'
+          ? parseFloat(amount.replace(/[^0-9.]/g, '')) || 0
+          : typeof amount === 'number'
+          ? amount
+          : 0;
+      return num.toLocaleString('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+      });
+    };
+
+    // 영어 템플릿: "Total Amount:", "Deposit Received:", "Remaining Balance:" 형식
     updatedContent = updatedContent
-      .replace(/총 금액: \$[\d.]+/g, `총 금액: $${totalAmount || '0'}`)
       .replace(
-        /보증금 입금 확인: \$[\d.]+/g,
-        `보증금 입금 확인: $${depositAmount || '0'}`
+        /Total Amount: \$[\d,.]+/g,
+        `Total Amount: ${formatCAD(totalAmount || '0')}`
       )
-      .replace(/잔금: \$[\d.]+/g, `잔금: $${remainingAmount || '0'}`);
+      .replace(
+        /Deposit Received: \$[\d,.]+/g,
+        `Deposit Received: ${formatCAD(depositAmount || '0')}`
+      )
+      .replace(
+        /Remaining Balance: \$[\d,.]+/g,
+        `Remaining Balance: ${formatCAD(remainingAmount || '0')}`
+      );
 
     return updatedContent;
   }
@@ -174,22 +159,44 @@ export function updateTemplateContent(
     // 환불 금액 업데이트
     const refundAmountValue = parseFloat(refundAmount || '0') || 0;
 
+    // 금액 포맷팅 함수
+    const formatCAD = (amount: number): string => {
+      return amount.toLocaleString('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+      });
+    };
+
     if (refundAmountValue > 0) {
-      // 환불 금액이 있을 때: "환불 금액 **$금액**은 3~5영업일 내..." 형식
+      // 관리자 취소: "we will provide a full refund of your deposit of **$X**" 형식
       updatedContent = updatedContent.replace(
-        /환불 금액 \*\*\$[\d.]+\*\*[\s\S]*?은/g,
-        `환불 금액 **$${refundAmountValue.toFixed(2)}**은`
+        /full refund of your deposit of \*\*\$[\d,]+(?:\.[\d]{2})?\*\*/g,
+        `full refund of your deposit of **${formatCAD(refundAmountValue)}**`
       );
+
+      // 고객 취소: "Your refund of **$X** will be processed..." 형식
+      updatedContent = updatedContent.replace(
+        /Your refund of \*\*\$[\d,]+(?:\.[\d]{2})?\*\* will be processed/g,
+        `Your refund of **${formatCAD(refundAmountValue)}** will be processed`
+      );
+
       // 환불 불가 메시지가 있으면 제거
       updatedContent = updatedContent.replace(
-        /환불 정책에 따라 이번 예약은 환불이 불가능합니다\./g,
+        /According to our refund policy, this reservation is not eligible for a refund\./g,
         ''
       );
     } else {
-      // 환불 금액이 0일 때: "환불 정책에 따라 이번 예약은 환불이 불가능합니다." 형식
+      // 환불 금액이 0일 때: "According to our refund policy..." 형식으로 변경
+      // 기존 환불 금액 문구를 제거하고 환불 불가 메시지로 교체
       updatedContent = updatedContent.replace(
-        /환불 금액 \*\*\$[\d.]+\*\*[\s\S]*?처리됩니다\./g,
-        '환불 정책에 따라 이번 예약은 환불이 불가능합니다.'
+        /Your refund of \*\*\$[\d,]+(?:\.[\d]{2})?\*\*[\s\S]*?business days\./g,
+        'According to our refund policy, this reservation is not eligible for a refund.'
+      );
+
+      // 관리자 취소 환불 문구도 제거 (환불 금액이 0이면 관리자 취소가 아님)
+      updatedContent = updatedContent.replace(
+        /full refund of your deposit of \*\*\$[\d,]+(?:\.[\d]{2})?\*\*[\s\S]*?business days\./g,
+        'According to our refund policy, this reservation is not eligible for a refund.'
       );
     }
 
@@ -198,12 +205,14 @@ export function updateTemplateContent(
 
   // 시간 업데이트 (AM/PM 형식)
   const 시간 = formatTime(reservationTime || '19:00');
+
+  // 영어 템플릿: "Reservation Date: ..." 형식
   updatedContent = updatedContent.replace(
-    /예약 날짜: .+? \(.*?\) \d+:\d+ (AM|PM)/g,
+    /Reservation Date: .+? \(.*?\) \d+:\d+ (AM|PM)/g,
     (match) => {
-      // 날짜와 요일 부분은 유지하고 시간만 변경
-      const dateAndDay = match.match(/예약 날짜: (.+? \(.*?\))/)?.[1] || '';
-      return `예약 날짜: ${dateAndDay} ${시간}`;
+      const dateAndDay =
+        match.match(/Reservation Date: (.+? \(.*?\))/)?.[1] || '';
+      return `Reservation Date: ${dateAndDay} ${시간}`;
     }
   );
 
@@ -220,45 +229,58 @@ export function updateTemplateContent(
 
   // 각 금액 항목을 정규식으로 찾아서 업데이트 (캐나다 달러 형식 지원)
   // formatCAD는 "$1,195.00" 형식을 생성 (CAD는 포함되지 않음)
+  // 영어 템플릿만 지원
   // 오마카세 코스 (인원 × 가격) 형식도 지원
   // 출장비는 추가 셰프비 처리 전에 업데이트 (줄 단위로 정확히 매칭)
-  updatedContent = updatedContent
-    .replace(/오마카세 코스[^:]*: \$[\d,.]+/g, (match) => {
-      const prefix =
-        match.match(/오마카세 코스[^:]*:/)?.[0] || '오마카세 코스:';
-      return `${prefix} ${formatCAD(courseAmount || '0')}`;
-    })
-    // 출장비는 줄 단위로 정확히 매칭 (추가 셰프비 줄과 혼동 방지)
-    .replace(/^출장비: \$[\d,.]+$/gm, `출장비: ${formatCAD(travelFee || '0')}`);
 
-  // 추가 셰프비 처리 (출장비 업데이트 후에 처리)
+  // 영어 템플릿: "Omakase Course (X guests × $Y): $Z" 형식
+  updatedContent = updatedContent.replace(
+    /Omakase Course \([\d\s]+guests? × [^)]+\): \$[\d,.]+/g,
+    (match) => {
+      // 인원 수와 메뉴 가격 정보 추출
+      const guestMatch = match.match(/(\d+)\s+guests?/);
+      const menuMatch = match.match(/×\s+([^)]+)\)/);
+      if (guestMatch && menuMatch) {
+        return `Omakase Course (${guestMatch[1]} guests × ${
+          menuMatch[1]
+        }): ${formatCAD(courseAmount || '0')}`;
+      }
+      return `Omakase Course: ${formatCAD(courseAmount || '0')}`;
+    }
+  );
+
+  // 출장비는 항상 표시 (Travel Fee: $X 형식)
+  // formatCAD는 "$1,195.00" 형식을 반환하므로 정확히 매칭
+  updatedContent = updatedContent.replace(
+    /^Travel Fee: \$[\d,]+(?:\.[\d]{2})?\s*$/gm,
+    `Travel Fee: ${formatCAD(travelFee || '0')}`
+  );
+
+  // 추가 셰프비 처리 (값이 있을 때만 표시)
   const extraChefFeeNum = parseFloat(extraChefFee || '0') || 0;
   if (extraChefFeeNum > 0) {
-    // 추가 셰프비 줄이 이미 있으면 업데이트
-    // "추가 셰프비:"로 시작하는 줄 전체를 찾아서 교체 (출장비와 혼동 방지)
-    if (updatedContent.includes('추가 셰프비:')) {
-      // 줄 단위로 처리하여 정확히 매칭
+    // Extra Chef Fee 줄이 이미 있으면 업데이트
+    if (updatedContent.includes('Extra Chef Fee:')) {
       updatedContent = updatedContent.replace(
-        /^추가 셰프비: .+$/gm,
-        `추가 셰프비: ${formatCAD(extraChefFee)}`
+        /^Extra Chef Fee: \$[\d,]+(?:\.[\d]{2})?\s*$/gm,
+        `Extra Chef Fee: ${formatCAD(extraChefFee)}`
       );
     } else {
-      // 추가 셰프비 줄이 없으면 출장비 다음 줄에 추가
-      // 출장비 줄만 정확히 찾아서 그 다음에 추가 (줄 단위 매칭)
+      // Extra Chef Fee 줄이 없으면 Travel Fee 다음 줄에 추가
       updatedContent = updatedContent.replace(
-        /^(출장비: \$[\d,.]+)$/gm,
-        `$1\n추가 셰프비: ${formatCAD(extraChefFee)}`
+        /^(Travel Fee: \$[\d,]+(?:\.[\d]{2})?\s*)$/gm,
+        `$1\nExtra Chef Fee: ${formatCAD(extraChefFee)}`
       );
     }
   } else {
-    // 추가 셰프비가 0이면 해당 줄 제거 (줄 단위로 정확히)
-    updatedContent = updatedContent.replace(/^추가 셰프비: .+$\n?/gm, '');
+    // 추가 셰프비가 0이거나 없으면 해당 줄 제거
+    updatedContent = updatedContent.replace(/^Extra Chef Fee: .+$\n?/gm, '');
   }
 
-  // 총합계 업데이트 (줄 단위로 정확히 매칭)
+  // 영어 템플릿: "Total: $X" 형식
   updatedContent = updatedContent.replace(
-    /^총합계: \$[\d,.]+$/gm,
-    `총합계: ${formatCAD(totalAmount || '0')}`
+    /^Total: \$[\d,.]+$/gm,
+    `Total: ${formatCAD(totalAmount || '0')}`
   );
 
   // 디파짓 업데이트 (**$금액** 형식)
