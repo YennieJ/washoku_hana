@@ -124,3 +124,43 @@ body {
   animation: infiniteScroll 15s linear infinite;
   width: max-content;
 }
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Event Portfolio Carousel spacers */
+.left-spacer,
+.right-spacer {
+  /* 기본: w-48 (192px), gap-6 (24px) → 50% - 이미지절반 - gap */
+  width: calc(50% - 96px - 24px);
+}
+
+@media (min-width: 640px) {
+  .left-spacer,
+  .right-spacer {
+    /* sm: w-56 (224px), gap-8 (32px) */
+    width: calc(50% - 112px - 32px);
+  }
+}
+
+@media (min-width: 768px) {
+  .left-spacer,
+  .right-spacer {
+    /* md: w-64 (256px), gap-8 (32px) */
+    width: calc(50% - 128px - 32px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .left-spacer,
+  .right-spacer {
+    /* lg: w-72 (288px), gap-6 (24px) */
+    width: calc(50% - 144px - 24px);
+  }
+}

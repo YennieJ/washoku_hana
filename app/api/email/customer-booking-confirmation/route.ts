@@ -27,7 +27,18 @@ export async function POST(request: NextRequest) {
 
     // 선택된 메뉴의 가격 정보 가져오기 및 총액 계산
     const selectedMenu = menuItems.find((m) => m.title === formData.menu);
-    const menuPrice = selectedMenu ? selectedMenu.price : 'N/A';
+    const guestCount = Number(formData.guestCount) || 0;
+
+    // Kaiseki Kappo Cuisine만 특별 처리
+    let menuPrice = 'N/A';
+    if (selectedMenu) {
+      if (selectedMenu.title === 'Kaiseki Kappo Cuisine') {
+        const pricePerPerson = guestCount < 4 ? 289 : 239;
+        menuPrice = `$${pricePerPerson} per person`;
+      } else {
+        menuPrice = selectedMenu.price;
+      }
+    }
 
     // 고객 이메일 본문 HTML 생성 (단순한 텍스트 기반)
     const emailHtml = `

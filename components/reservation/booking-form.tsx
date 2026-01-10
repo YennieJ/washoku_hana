@@ -57,11 +57,34 @@ export default function BookingForm({
       return;
     }
 
-    // Validate guest count - only check minimum
+    // Validate guest count - check minimum
     const guestCount = Number(formData.guestCount);
     if (!guestCount || guestCount < selectedMenu.minGuests) {
       alert(
         `Minimum ${selectedMenu.minGuests} guests required for ${selectedMenu.title}.`
+      );
+      return;
+    }
+
+    // Kaiseki Kappo Cuisine만 최대 인원 검증
+    if (
+      selectedMenu.title === 'Kaiseki Kappo Cuisine' &&
+      guestCount > selectedMenu.maxGuests
+    ) {
+      alert(
+        `Maximum ${selectedMenu.maxGuests} guests allowed for ${selectedMenu.title}.`
+      );
+      return;
+    }
+
+    // inquiryRequired가 있는 경우 검증 (Kaiseki 제외)
+    if (
+      selectedMenu.title !== 'Kaiseki Kappo Cuisine' &&
+      selectedMenu.inquiryRequired &&
+      guestCount >= selectedMenu.inquiryRequired
+    ) {
+      alert(
+        `For ${selectedMenu.title}, ${selectedMenu.inquiryRequired} or more guests require email inquiry. Please contact us directly.`
       );
       return;
     }
@@ -267,6 +290,9 @@ export default function BookingForm({
                         {menu.title}
                         <p className="text-xs text-gray-400 mt-0.5">
                           {menu.minGuests}-{menu.maxGuests} guests
+                          {menu.title === 'Kaiseki Kappo Cuisine' && (
+                            <span> (Less than 4 guests $289)</span>
+                          )}
                           {menu.inquiryRequired && (
                             <span> (Over max: email)</span>
                           )}
@@ -306,6 +332,11 @@ export default function BookingForm({
                   <input
                     type="number"
                     min={selectedMenu.minGuests}
+                    max={
+                      selectedMenu.title === 'Kaiseki Kappo Cuisine'
+                        ? selectedMenu.maxGuests
+                        : undefined
+                    }
                     value={formData.guestCount}
                     onChange={(e) =>
                       setFormData({ ...formData, guestCount: e.target.value })
@@ -316,6 +347,9 @@ export default function BookingForm({
                   />
                   <p className="text-xs text-gray-400 mt-1.5">
                     {selectedMenu.minGuests}-{selectedMenu.maxGuests} guests
+                    {selectedMenu.title === 'Kaiseki Kappo Cuisine' && (
+                      <span> (Less than 4 guests $289)</span>
+                    )}
                     {selectedMenu.inquiryRequired && (
                       <span> (Over max: email)</span>
                     )}

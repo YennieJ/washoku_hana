@@ -6,7 +6,7 @@ export default function AboutMenuSection() {
       {/* Flowing Images Background - 640px and above */}
       <div className="hidden sm:block absolute top-4 left-0 right-0 flex flex-col justify-start gap-3 px-4">
         {/* First row */}
-        <div className="flex gap-4 justify-center opacity-60">
+        <div className="flex gap-4 justify-center opacity-80">
           <div className="relative w-64 h-40">
             <Image
               src="/Honmaguro.jpeg"
@@ -41,8 +41,8 @@ export default function AboutMenuSection() {
           </div>
           <div className="relative w-64 h-40">
             <Image
-              src="/uni.jpeg"
-              alt="Uni"
+              src="/caviar.jpg"
+              alt="Caviar"
               fill
               className="object-cover rounded"
             />
@@ -52,7 +52,7 @@ export default function AboutMenuSection() {
 
       {/* Mobile Images - Infinite Slider for screens 640px and below */}
       <div className="sm:hidden absolute top-4 left-0 right-0 overflow-hidden">
-        <div className="flex gap-4 opacity-50 animate-infinite-scroll">
+        <div className="flex gap-4 opacity-70 animate-infinite-scroll">
           {/* First set of images */}
           <div className="relative w-64 h-48 flex-shrink-0">
             <Image
@@ -88,8 +88,8 @@ export default function AboutMenuSection() {
           </div>
           <div className="relative w-64 h-48 flex-shrink-0">
             <Image
-              src="/uni.jpeg"
-              alt="Uni"
+              src="/caviar.jpg"
+              alt="Caviar"
               fill
               className="object-cover rounded"
             />
@@ -129,8 +129,8 @@ export default function AboutMenuSection() {
           </div>
           <div className="relative w-64 h-48 flex-shrink-0">
             <Image
-              src="/uni.jpeg"
-              alt="Uni"
+              src="/caviar.jpg"
+              alt="Caviar"
               fill
               className="object-cover rounded"
             />

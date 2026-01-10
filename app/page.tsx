@@ -4,6 +4,8 @@ import HeroSection from '@/components/home/hero-section';
 import ChefSection from '@/components/home/chef-section';
 import AboutMenuSection from '@/components/home/about-menu-section';
 import ServiceSection from '@/components/home/service-section';
+import EventPortfolioCarousel from '@/components/home/event-portfolio-carousel';
+import { eventImages } from '@/constants/carousel-image';
 
 const Divider = () => {
   return (
@@ -32,6 +34,10 @@ export default function HomePage() {
       <Divider />
 
       <ServiceSection />
+
+      <Divider />
+
+      <EventPortfolioCarousel images={eventImages} />
 
       <Footer />
     </div>

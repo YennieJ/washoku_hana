@@ -43,12 +43,24 @@ export function createAwaitingDepositTemplate(
 
   // 선택된 메뉴의 가격 정보 가져오기 및 기본 금액 계산
   const selectedMenu = menuItems.find((m) => m.title === booking.menu);
-  const menuPrice = selectedMenu ? selectedMenu.price : 'N/A';
-
-  // 가격에서 숫자 추출 (예: "$149 per person" -> 149)
-  const priceMatch = menuPrice.match(/\$?(\d+)/);
-  const pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
   const guestCount = booking.guest_count || 0;
+
+  // Kaiseki Kappo Cuisine만 특별 처리
+  let pricePerPerson = 0;
+  let menuPriceDisplay = 'N/A';
+
+  if (selectedMenu) {
+    if (selectedMenu.title === 'Kaiseki Kappo Cuisine') {
+      pricePerPerson = guestCount < 4 ? 289 : 239;
+      menuPriceDisplay = `$${pricePerPerson} per person`;
+    } else {
+      menuPriceDisplay = selectedMenu.price;
+      // 다른 메뉴는 기존 로직
+      const priceMatch = menuPriceDisplay.match(/\$?(\d+)/);
+      pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
+    }
+  }
+
   const baseAmount = pricePerPerson * guestCount;
 
   // 금액 포맷팅 함수 (캐나다 달러 형식)
@@ -77,7 +89,9 @@ Thank you for your reservation with Washoku Hana. We are delighted to provide yo
 ${bookingInfoSection}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 Cost Breakdown:
-Omakase Course (${guestCount} guests × ${menuPrice}): ${formatCAD(course)}
+Omakase Course (${guestCount} guests × ${menuPriceDisplay}): ${formatCAD(
+    course
+  )}
 Travel Fee: ${formatCAD(travelFeeAmount)}`;
   // 추가 셰프비가 0이 아닐 때만 추가
   const extraChefFeeNum = parseFloat(extraChefFee || '0') || 0;

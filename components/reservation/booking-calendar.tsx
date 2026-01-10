@@ -235,6 +235,10 @@ export default function BookingCalendar({
       <div className="mt-6 text-sm text-gray-400 space-y-1 font-light">
         <p>• Weekend reservations (Sat, Sun) at 7 PM only</p>
         <p>
+          • For reservations at times other than 7 PM, please contact us through
+          Special Requests
+        </p>
+        <p>
           • All reservations require at least 1 week advance notice (8 days from
           today)
         </p>

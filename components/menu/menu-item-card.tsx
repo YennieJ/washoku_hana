@@ -58,6 +58,11 @@ export default function MenuItemCard({
             <div className="flex items-center gap-4 flex-wrap sm:justify-between">
               <div className="text-sm text-gray-400 whitespace-nowrap">
                 {minGuests}-{maxGuests} guests
+                {title === 'Kaiseki Kappo Cuisine' && (
+                  <span className="text-xs ml-1">
+                    (Less than 4 guests $289)
+                  </span>
+                )}
                 {inquiryRequired && (
                   <span className="text-xs ml-1">(Over max: email)</span>
                 )}

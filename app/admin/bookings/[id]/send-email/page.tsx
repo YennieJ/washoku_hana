@@ -107,8 +107,17 @@ export default function SendEmailPage({ params }: PageProps) {
       ) {
         const selectedMenu = menuItems.find((m) => m.title === booking.menu);
         if (selectedMenu) {
-          const priceMatch = selectedMenu.price.match(/\$?(\d+)/);
-          const pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
+          let pricePerPerson = 0;
+
+          // Kaiseki Kappo Cuisine만 특별 처리
+          if (selectedMenu.title === 'Kaiseki Kappo Cuisine') {
+            pricePerPerson = booking.guest_count < 4 ? 289 : 239;
+          } else {
+            // 다른 메뉴는 기존 로직
+            const priceMatch = selectedMenu.price.match(/\$?(\d+)/);
+            pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
+          }
+
           const baseAmount = pricePerPerson * booking.guest_count;
           if (baseAmount > 0) {
             setCourseAmount(baseAmount.toString());
