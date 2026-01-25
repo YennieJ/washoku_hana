@@ -25,6 +25,10 @@ export async function GET(request: NextRequest) {
       const month = now.getMonth();
 
       switch (period) {
+        case 'year': // 이번 연도
+          dateStart = new Date(year, 0, 1).toISOString();
+          dateEnd = new Date(year, 11, 31, 23, 59, 59).toISOString();
+          break;
         case 'prev': // 이전달
           dateStart = new Date(year, month - 1, 1).toISOString();
           dateEnd = new Date(year, month, 0, 23, 59, 59).toISOString();
@@ -37,21 +41,20 @@ export async function GET(request: NextRequest) {
           dateStart = new Date(year, month + 1, 1).toISOString();
           dateEnd = new Date(year, month + 2, 0, 23, 59, 59).toISOString();
           break;
-        default: // 기본값: 이번달 + 다음달
-          dateStart = new Date(year, month, 1).toISOString();
-          dateEnd = new Date(year, month + 2, 0, 23, 59, 59).toISOString();
+        default: // 기본값: 이번 연도
+          dateStart = new Date(year, 0, 1).toISOString();
+          dateEnd = new Date(year, 11, 31, 23, 59, 59).toISOString();
       }
     } else if (startDate && endDate) {
       // 커스텀 기간
       dateStart = new Date(startDate).toISOString();
       dateEnd = new Date(endDate + 'T23:59:59').toISOString();
     } else {
-      // 기본값: 이번달 + 다음달
+      // 기본값: 이번 연도
       const now = new Date();
       const year = now.getFullYear();
-      const month = now.getMonth();
-      dateStart = new Date(year, month, 1).toISOString();
-      dateEnd = new Date(year, month + 2, 0, 23, 59, 59).toISOString();
+      dateStart = new Date(year, 0, 1).toISOString();
+      dateEnd = new Date(year, 11, 31, 23, 59, 59).toISOString();
     }
 
     // 1. 읽지 않은 데이터 (기간 상관없이)

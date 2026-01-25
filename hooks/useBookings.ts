@@ -30,8 +30,8 @@ async function fetchBookings(filters: BookingsFilters): Promise<Booking[]> {
         params.append('startDate', filters.customStartDate);
         params.append('endDate', filters.customEndDate);
       }
-    } else if (filters.period !== 'default') {
-      // API와 동일한 값 사용 (current, prev, next)
+    } else {
+      // API와 동일한 값 사용 (year, current, prev, next)
       params.append('period', filters.period);
     }
   }
