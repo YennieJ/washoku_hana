@@ -4,6 +4,7 @@ import { useBookings } from '@/hooks/useBookings';
 import { useMarkAsRead } from '@/hooks/useMarkAsRead';
 import type { Booking } from '@/lib/supabase';
 import { type PeriodType, DEFAULT_PERIOD } from '@/constants/period-filters';
+import { parseBookingDate } from '@/utils/email-utils';
 import { type ReadType, DEFAULT_READ_FILTER } from '@/constants/read-filters';
 import {
   type StatusFilterType,
@@ -79,7 +80,7 @@ export default function AdminDashboard() {
   const unreadCount = bookings.filter((b) => !b.is_read).length;
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseBookingDate(dateString);
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
   };
 
   const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseBookingDate(dateString);
     return date.toLocaleTimeString('ko-KR', {
       hour: '2-digit',
       minute: '2-digit',

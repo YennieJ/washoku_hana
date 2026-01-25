@@ -3,6 +3,7 @@ import {
   formatBookingInfoSection,
   formatTime,
   getEmailSignature,
+  parseBookingDate,
 } from '@/utils/email-utils';
 
 export function createConfirmedTemplate(
@@ -48,7 +49,7 @@ export function createConfirmedTemplate(
     `${chefArrivalHours}:${chefArrivalMins.toString().padStart(2, '0')}`
   );
 
-  const bookingDate = new Date(reservationDate || booking.booking_date);
+  const bookingDate = parseBookingDate(reservationDate || booking.booking_date);
   const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',

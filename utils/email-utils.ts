@@ -1,6 +1,20 @@
 import type { Booking } from '@/lib/supabase';
 import { ADMIN_EMAIL } from '@/constants/email';
 
+/**
+ * 날짜 문자열을 안전하게 Date 객체로 변환
+ * YYYY-MM-DD 형식은 UTC로 해석되는 문제를 방지하기 위해 시간을 추가
+ * @param dateString - 날짜 문자열 (YYYY-MM-DD 또는 YYYY-MM-DDTHH:mm:ss)
+ * @returns Date 객체
+ */
+export function parseBookingDate(dateString: string): Date {
+  // 날짜만 있는 경우 (YYYY-MM-DD), 로컬 시간 정오로 설정하여 타임존 문제 방지
+  if (dateString && !dateString.includes('T')) {
+    return new Date(`${dateString}T12:00:00`);
+  }
+  return new Date(dateString);
+}
+
 // 이메일 템플릿 공통 서명
 export function getEmailSignature(): string {
   return `Warm regards,
@@ -30,7 +44,7 @@ export function formatBookingInfoSection(
   reservationDate?: string
 ): string {
   // 날짜가 전달되면 사용, 아니면 booking.booking_date 사용
-  const bookingDate = new Date(reservationDate || booking.booking_date);
+  const bookingDate = parseBookingDate(reservationDate || booking.booking_date);
   const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',

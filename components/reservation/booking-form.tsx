@@ -96,6 +96,8 @@ export default function BookingForm({
 
   const handleConfirmBooking = async () => {
     setIsSubmitting(true);
+    // 밴쿠버 현지 시간으로 저장 (타임존 정보 없이 문자열로 저장)
+    // DB에서 읽을 때도 밴쿠버 시간으로 해석
     const bookingDateTime = `${selectedDate}T19:00:00`;
 
     try {

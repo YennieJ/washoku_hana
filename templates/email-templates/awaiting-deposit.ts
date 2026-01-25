@@ -3,6 +3,7 @@ import {
   formatBookingInfoSection,
   formatTime,
   getEmailSignature,
+  parseBookingDate,
 } from '@/utils/email-utils';
 import { ADMIN_EMAIL } from '@/constants/email';
 import {
@@ -24,7 +25,7 @@ export function createAwaitingDepositTemplate(
     reservationDate,
   } = data;
 
-  const bookingDate = new Date(reservationDate || booking.booking_date);
+  const bookingDate = parseBookingDate(reservationDate || booking.booking_date);
   const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',

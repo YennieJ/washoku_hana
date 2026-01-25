@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Booking } from '@/lib/supabase';
 import { useSaveAdminMemo } from '@/hooks/useSaveAdminMemo';
+import { parseBookingDate } from '@/utils/email-utils';
 
 interface BookingDetailModalProps {
   selectedBooking: Booking;
@@ -48,7 +49,7 @@ export default function BookingDetailModal({
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseBookingDate(dateString);
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
@@ -57,7 +58,7 @@ export default function BookingDetailModal({
   };
 
   const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseBookingDate(dateString);
     return date.toLocaleTimeString('ko-KR', {
       hour: '2-digit',
       minute: '2-digit',

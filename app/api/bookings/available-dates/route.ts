@@ -25,14 +25,13 @@ export async function GET(request: NextRequest) {
     }
 
     // 날짜만 추출 (YYYY-MM-DD 형식)
+    // booking_date는 밴쿠버 시간으로 저장되어 있으므로 문자열에서 직접 추출
     const unavailableDates = new Set<string>();
 
     if (bookings) {
       bookings.forEach((booking) => {
-        const date = new Date(booking.booking_date);
-        const dateStr = `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        // 타임존 변환 없이 문자열에서 직접 날짜 추출
+        const dateStr = booking.booking_date.split('T')[0];
         unavailableDates.add(dateStr);
       });
     }

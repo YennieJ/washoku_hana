@@ -3,6 +3,7 @@ import {
   formatBookingInfoSection,
   formatTime,
   getEmailSignature,
+  parseBookingDate,
 } from '@/utils/email-utils';
 
 export function createCancelledTemplate(
@@ -16,7 +17,7 @@ export function createCancelledTemplate(
     cancellationType = 'customer', // 기본값: 고객 취소
   } = data;
 
-  const bookingDate = new Date(reservationDate || booking.booking_date);
+  const bookingDate = parseBookingDate(reservationDate || booking.booking_date);
   const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',

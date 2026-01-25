@@ -20,6 +20,7 @@ import type { EmailTemplateType } from '@/types/email-templates';
 import { ADMIN_EMAIL } from '@/constants/email';
 import { getEditCard } from '@/components/admin/send-email';
 import { calculateCourseAmount } from '@/utils/price-calculator';
+import { parseBookingDate } from '@/utils/email-utils';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -89,9 +90,8 @@ export default function SendEmailPage({ params }: PageProps) {
   useEffect(() => {
     if (booking) {
       if (!reservationDate) {
-        // YYYY-MM-DD 형식으로 변환
-        const date = new Date(booking.booking_date);
-        const formatted = date.toISOString().split('T')[0];
+        // YYYY-MM-DD 형식으로 변환 (타임존 변환 없이 문자열에서 직접 추출)
+        const formatted = booking.booking_date.split('T')[0];
         setReservationDate(formatted);
       }
       // 환불 금액 초기화 (booking에 있으면 사용)
@@ -400,7 +400,7 @@ export default function SendEmailPage({ params }: PageProps) {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseBookingDate(dateString);
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
@@ -409,7 +409,7 @@ export default function SendEmailPage({ params }: PageProps) {
   };
 
   const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = parseBookingDate(dateString);
     return date.toLocaleTimeString('ko-KR', {
       hour: '2-digit',
       minute: '2-digit',

@@ -3,12 +3,13 @@ import {
   formatBookingInfoSection,
   formatTime,
   getEmailSignature,
+  parseBookingDate,
 } from '@/utils/email-utils';
 
 export function createDeclinedTemplate(data: EmailTemplateData): EmailTemplate {
   const { booking, reservationTime, reservationDate } = data;
 
-  const bookingDate = new Date(reservationDate || booking.booking_date);
+  const bookingDate = parseBookingDate(reservationDate || booking.booking_date);
   const formattedDate = bookingDate.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',
