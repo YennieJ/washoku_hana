@@ -120,7 +120,7 @@ export default function BookingCalendar({
   };
 
   const handleDateClick = (day: number) => {
-    if (isPastDate(day) || !isWeekend(day) || isUnavailable(day)) return;
+    if (isPastDate(day) || isUnavailable(day)) return;
 
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(
       day
@@ -199,12 +199,13 @@ export default function BookingCalendar({
           const isPastDay = isPastDate(day);
           const isUnavailableDay = isUnavailable(day);
           const isSelectedDay = isSelected(day);
+          const isAvailable = !isPastDay && !isUnavailableDay;
 
           return (
             <div key={index} className="relative group">
               <button
                 onClick={() => handleDateClick(day)}
-                disabled={isPastDay || !isWeekendDay || isUnavailableDay}
+                disabled={isPastDay || isUnavailableDay}
                 className={`
                   h-12 w-full text-sm border transition-all duration-300 rounded font-light
                   ${
@@ -212,7 +213,7 @@ export default function BookingCalendar({
                       ? 'text-gray-500 cursor-not-allowed bg-red-900/20 border-red-800/30 line-through'
                       : isPastDay
                       ? 'text-gray-600 cursor-not-allowed bg-black/20 border-gray-800'
-                      : isWeekendDay
+                      : isAvailable
                       ? 'text-primary border-primary/30 hover:bg-primary hover:text-white cursor-pointer hover:border-primary'
                       : 'text-gray-600 cursor-not-allowed bg-black/20 border-gray-800'
                   }
@@ -233,7 +234,6 @@ export default function BookingCalendar({
       </div>
 
       <div className="mt-6 text-sm text-gray-400 space-y-1 font-light">
-        <p>• Weekend reservations (Sat, Sun) at 7 PM only</p>
         <p>
           • For reservations at times other than 7 PM, please contact us through
           Special Requests
