@@ -1,3 +1,10 @@
+// 가격 티어 정의
+export interface PriceTier {
+  minGuests: number; // 최소 인원 (이상)
+  maxGuests: number; // 최대 인원 (이하)
+  price: number; // 인당 가격
+}
+
 export interface MenuItem {
   id: number;
   image: string;
@@ -5,10 +12,11 @@ export interface MenuItem {
   title: string;
   subtitle: string;
   description: string;
-  price: string;
+  price: string; // UI 표시용 기본 가격
   imageFit?: 'cover' | 'contain';
   minGuests: number;
   maxGuests: number;
+  priceTiers?: PriceTier[]; // 가격 티어 (없으면 price에서 파싱)
   inquiryRequired?: number; // 이 인원 이상일 때 문의 필요
 }
 
@@ -20,10 +28,13 @@ export const menuItems: MenuItem[] = [
     title: 'Premium Sushi Omakase',
     subtitle: 'The True Essence of Sushi.',
     description: `Experience an authentic Kyoto-style omakase restaurant in the comfort of your home. A 17-course journey begins with refined appetizers and sashimi, followed by perfectly balanced nigiri sushi and a delicate dessert. Every moment is crafted by the hands of a master, bringing the full spirit of traditional Japanese omakase sushi to your table.`,
-    price: '$189 per person',
-    minGuests: 3,
-    maxGuests: 5,
-    inquiryRequired: 6, // 6명 이상일 때 문의 필요
+    price: 'From $149 per person',
+    minGuests: 4,
+    maxGuests: 20,
+    priceTiers: [
+      { minGuests: 4, maxGuests: 5, price: 180 },
+      { minGuests: 6, maxGuests: 20, price: 149 },
+    ],
   },
   {
     id: 2,
@@ -32,9 +43,13 @@ export const menuItems: MenuItem[] = [
     title: 'Kaiseki Kappo Cuisine',
     subtitle: 'A Journey Through the Seasons.',
     description: `Discover the elegance of Kaiseki Kappo, crafted with traditional Japanese techniques. Each course reflects the beauty of the season—ingredients, colors, tableware, and even the chopsticks are thoughtfully chosen to express harmony with nature. From the opening zensai to the highlight of the Kaiseki course, hassun, every dish celebrates the spirit of the season. Sashimi, grilled, fried, simmered, and steamed dishes are prepared with precision to bring out the most delicate flavors and presentation. And the best part—you can experience this exquisite Kaiseki journey in the comfort of your own home.`,
-    price: '$239 per person',
-    minGuests: 2, // 2명부터 예약 가능
+    price: 'From $239 per person',
+    minGuests: 2,
     maxGuests: 8,
+    priceTiers: [
+      { minGuests: 2, maxGuests: 3, price: 289 },
+      { minGuests: 4, maxGuests: 8, price: 239 },
+    ],
   },
   {
     id: 3,
@@ -47,6 +62,7 @@ export const menuItems: MenuItem[] = [
     price: '$119 per person',
     minGuests: 15,
     maxGuests: 30,
+    priceTiers: [{ minGuests: 15, maxGuests: 30, price: 119 }],
     inquiryRequired: 31, // 31명 이상일 때 문의 필요
   },
 ];

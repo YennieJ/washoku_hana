@@ -1,15 +1,20 @@
-import { menuItems } from '@/constants/menu-items';
+import { menuItems, type PriceTier } from '@/constants/menu-items';
 
 /**
- * Kaiseki Kappo Cuisine의 인원 수에 따른 인당 가격 계산
- * - 2-3명: $289 per person
- * - 4-8명: $239 per person
+ * 메뉴의 가격 티어 조회
  */
-export function getKaisekiPricePerPerson(guestCount: number): number {
-  if (guestCount < 4) {
-    return 289;
-  }
-  return 239;
+export function getPriceTier(
+  menuTitle: string,
+  guestCount: number
+): PriceTier | null {
+  const menu = menuItems.find((m) => m.title === menuTitle);
+  if (!menu?.priceTiers) return null;
+
+  const tier = menu.priceTiers.find(
+    (t) => guestCount >= t.minGuests && guestCount <= t.maxGuests
+  );
+
+  return tier ?? null;
 }
 
 /**
@@ -22,12 +27,13 @@ export function getPricePerPerson(
   const menu = menuItems.find((m) => m.title === menuTitle);
   if (!menu) return 0;
 
-  // Kaiseki Kappo Cuisine만 특별 처리
-  if (menu.title === 'Kaiseki Kappo Cuisine') {
-    return getKaisekiPricePerPerson(guestCount);
+  // priceTiers가 있으면 티어에서 찾기
+  if (menu.priceTiers) {
+    const tier = getPriceTier(menuTitle, guestCount);
+    return tier?.price ?? 0;
   }
 
-  // 다른 메뉴는 기존 로직 (price 문자열에서 숫자 추출)
+  // 없으면 기존 로직 (price 문자열에서 숫자 추출)
   const priceMatch = menu.price.match(/\$?(\d+)/);
   return priceMatch ? parseFloat(priceMatch[1]) : 0;
 }
@@ -41,4 +47,38 @@ export function calculateCourseAmount(
 ): number {
   const pricePerPerson = getPricePerPerson(menuTitle, guestCount);
   return pricePerPerson * guestCount;
+}
+
+/**
+ * 가격 티어 안내 텍스트 생성 (UI용)
+ * 예: "4-5: $180 / 6-20: $149"
+ */
+export function getPriceTierNotice(menuTitle: string): string | null {
+  const menu = menuItems.find((m) => m.title === menuTitle);
+  if (!menu?.priceTiers || menu.priceTiers.length <= 1) return null;
+
+  return menu.priceTiers
+    .map((t) => `${t.minGuests}-${t.maxGuests}: $${t.price}`)
+    .join(' / ');
+}
+
+/**
+ * 인당 가격 표시 텍스트 생성
+ * 예: "$180 per person" 또는 "From $149 per person"
+ */
+export function getPriceDisplayText(
+  menuTitle: string,
+  guestCount?: number
+): string {
+  const menu = menuItems.find((m) => m.title === menuTitle);
+  if (!menu) return '';
+
+  // 인원 수가 지정되면 해당 인원의 가격 반환
+  if (guestCount !== undefined) {
+    const price = getPricePerPerson(menuTitle, guestCount);
+    return price > 0 ? `$${price} per person` : '';
+  }
+
+  // 인원 수가 없으면 기본 표시 가격 반환
+  return menu.price;
 }

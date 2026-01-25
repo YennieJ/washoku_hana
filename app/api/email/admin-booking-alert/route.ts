@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { ADMIN_EMAIL } from '@/constants/email';
-import { menuItems } from '@/constants/menu-items';
+import { getPricePerPerson } from '@/utils/price-calculator';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -27,20 +27,11 @@ export async function POST(request: NextRequest) {
       : 'https://localhost:3000';
     const adminUrl = `${baseUrl}/admin/dashboard`;
 
-    // 선택된 메뉴의 가격 정보 가져오기
-    const selectedMenu = menuItems.find((m) => m.title === formData.menu);
+    // 가격 계산 (유틸리티 함수 사용)
     const guestCount = Number(formData.guestCount) || 0;
-
-    // Kaiseki Kappo Cuisine만 특별 처리
-    let menuPrice = 'N/A';
-    if (selectedMenu) {
-      if (selectedMenu.title === 'Kaiseki Kappo Cuisine') {
-        const pricePerPerson = guestCount < 4 ? 289 : 239;
-        menuPrice = `$${pricePerPerson} per person`;
-      } else {
-        menuPrice = selectedMenu.price;
-      }
-    }
+    const pricePerPerson = getPricePerPerson(formData.menu, guestCount);
+    const menuPrice =
+      pricePerPerson > 0 ? `$${pricePerPerson} per person` : 'N/A';
 
     // 이메일 본문 HTML 생성
     const emailHtml = `

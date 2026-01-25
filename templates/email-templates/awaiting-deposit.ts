@@ -5,7 +5,10 @@ import {
   getEmailSignature,
 } from '@/utils/email-utils';
 import { ADMIN_EMAIL } from '@/constants/email';
-import { menuItems } from '@/constants/menu-items';
+import {
+  getPricePerPerson,
+  calculateCourseAmount,
+} from '@/utils/price-calculator';
 
 export function createAwaitingDepositTemplate(
   data: EmailTemplateData
@@ -41,27 +44,12 @@ export function createAwaitingDepositTemplate(
     day: 'numeric',
   });
 
-  // 선택된 메뉴의 가격 정보 가져오기 및 기본 금액 계산
-  const selectedMenu = menuItems.find((m) => m.title === booking.menu);
+  // 가격 계산 (유틸리티 함수 사용)
   const guestCount = booking.guest_count || 0;
-
-  // Kaiseki Kappo Cuisine만 특별 처리
-  let pricePerPerson = 0;
-  let menuPriceDisplay = 'N/A';
-
-  if (selectedMenu) {
-    if (selectedMenu.title === 'Kaiseki Kappo Cuisine') {
-      pricePerPerson = guestCount < 4 ? 289 : 239;
-      menuPriceDisplay = `$${pricePerPerson} per person`;
-    } else {
-      menuPriceDisplay = selectedMenu.price;
-      // 다른 메뉴는 기존 로직
-      const priceMatch = menuPriceDisplay.match(/\$?(\d+)/);
-      pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
-    }
-  }
-
-  const baseAmount = pricePerPerson * guestCount;
+  const pricePerPerson = getPricePerPerson(booking.menu, guestCount);
+  const menuPriceDisplay =
+    pricePerPerson > 0 ? `$${pricePerPerson} per person` : 'N/A';
+  const baseAmount = calculateCourseAmount(booking.menu, guestCount);
 
   // 금액 포맷팅 함수 (캐나다 달러 형식)
   const formatCAD = (amount: string | number): string => {

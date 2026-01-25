@@ -19,7 +19,7 @@ import { updateTemplateContent } from '@/utils/template-updater';
 import type { EmailTemplateType } from '@/types/email-templates';
 import { ADMIN_EMAIL } from '@/constants/email';
 import { getEditCard } from '@/components/admin/send-email';
-import { menuItems } from '@/constants/menu-items';
+import { calculateCourseAmount } from '@/utils/price-calculator';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -105,23 +105,12 @@ export default function SendEmailPage({ params }: PageProps) {
         booking.menu &&
         booking.guest_count
       ) {
-        const selectedMenu = menuItems.find((m) => m.title === booking.menu);
-        if (selectedMenu) {
-          let pricePerPerson = 0;
-
-          // Kaiseki Kappo Cuisine만 특별 처리
-          if (selectedMenu.title === 'Kaiseki Kappo Cuisine') {
-            pricePerPerson = booking.guest_count < 4 ? 289 : 239;
-          } else {
-            // 다른 메뉴는 기존 로직
-            const priceMatch = selectedMenu.price.match(/\$?(\d+)/);
-            pricePerPerson = priceMatch ? parseFloat(priceMatch[1]) : 0;
-          }
-
-          const baseAmount = pricePerPerson * booking.guest_count;
-          if (baseAmount > 0) {
-            setCourseAmount(baseAmount.toString());
-          }
+        const baseAmount = calculateCourseAmount(
+          booking.menu,
+          booking.guest_count
+        );
+        if (baseAmount > 0) {
+          setCourseAmount(baseAmount.toString());
         }
       }
     }

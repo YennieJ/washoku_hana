@@ -5,6 +5,7 @@ import { menuItems } from '@/constants/menu-items';
 import { useCreateBooking } from '@/hooks/useCreateBooking';
 import { useSendBookingConfirmationEmail } from '@/hooks/useSendBookingConfirmationEmail';
 import { useSendAdminEmail } from '@/hooks/useSendAdminEmail';
+import { getPriceTierNotice } from '@/utils/price-calculator';
 
 interface BookingFormProps {
   selectedDate: string;
@@ -66,25 +67,10 @@ export default function BookingForm({
       return;
     }
 
-    // Kaiseki Kappo Cuisine만 최대 인원 검증
-    if (
-      selectedMenu.title === 'Kaiseki Kappo Cuisine' &&
-      guestCount > selectedMenu.maxGuests
-    ) {
+    // 최대 인원 검증 (inquiryRequired가 없는 메뉴만)
+    if (!selectedMenu.inquiryRequired && guestCount > selectedMenu.maxGuests) {
       alert(
         `Maximum ${selectedMenu.maxGuests} guests allowed for ${selectedMenu.title}.`
-      );
-      return;
-    }
-
-    // inquiryRequired가 있는 경우 검증 (Kaiseki 제외)
-    if (
-      selectedMenu.title !== 'Kaiseki Kappo Cuisine' &&
-      selectedMenu.inquiryRequired &&
-      guestCount >= selectedMenu.inquiryRequired
-    ) {
-      alert(
-        `For ${selectedMenu.title}, ${selectedMenu.inquiryRequired} or more guests require email inquiry. Please contact us directly.`
       );
       return;
     }
@@ -290,11 +276,11 @@ export default function BookingForm({
                         {menu.title}
                         <p className="text-xs text-gray-400 mt-0.5">
                           {menu.minGuests}-{menu.maxGuests} guests
-                          {menu.title === 'Kaiseki Kappo Cuisine' && (
-                            <span> (Less than 4 guests $289)</span>
+                          {getPriceTierNotice(menu.title) && (
+                            <span> ({getPriceTierNotice(menu.title)})</span>
                           )}
                           {menu.inquiryRequired && (
-                            <span> (Over max: email)</span>
+                            <span> (Larger groups welcome - inquire)</span>
                           )}
                         </p>
                       </span>
@@ -327,15 +313,16 @@ export default function BookingForm({
                 );
               }
 
+              const priceTierNotice = getPriceTierNotice(selectedMenu.title);
               return (
                 <>
                   <input
                     type="number"
                     min={selectedMenu.minGuests}
                     max={
-                      selectedMenu.title === 'Kaiseki Kappo Cuisine'
-                        ? selectedMenu.maxGuests
-                        : undefined
+                      selectedMenu.inquiryRequired
+                        ? undefined
+                        : selectedMenu.maxGuests
                     }
                     value={formData.guestCount}
                     onChange={(e) =>
@@ -347,11 +334,9 @@ export default function BookingForm({
                   />
                   <p className="text-xs text-gray-400 mt-1.5">
                     {selectedMenu.minGuests}-{selectedMenu.maxGuests} guests
-                    {selectedMenu.title === 'Kaiseki Kappo Cuisine' && (
-                      <span> (Less than 4 guests $289)</span>
-                    )}
+                    {priceTierNotice && <span> ({priceTierNotice})</span>}
                     {selectedMenu.inquiryRequired && (
-                      <span> (Over max: email)</span>
+                      <span> (Larger groups welcome - inquire)</span>
                     )}
                   </p>
                 </>

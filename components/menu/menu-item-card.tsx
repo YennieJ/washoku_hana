@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getPriceTierNotice } from '@/utils/price-calculator';
 
 interface MenuItemCardProps {
   image: string;
@@ -26,6 +27,7 @@ export default function MenuItemCard({
   maxGuests,
   inquiryRequired,
 }: MenuItemCardProps) {
+  const priceTierNotice = getPriceTierNotice(title);
   return (
     <div className="group bg-white/5 border border-primary/20 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/40 backdrop-blur-sm">
       <div className="flex flex-col lg:flex-row">
@@ -56,15 +58,17 @@ export default function MenuItemCard({
           </div>
           <div className="mt-3 space-y-3">
             <div className="flex items-center gap-4 flex-wrap sm:justify-between">
-              <div className="text-sm text-gray-400 whitespace-nowrap">
-                {minGuests}-{maxGuests} guests
-                {title === 'Kaiseki Kappo Cuisine' && (
-                  <span className="text-xs ml-1">
-                    (Less than 4 guests $289)
+              <div className="text-sm text-gray-400">
+                <span className="whitespace-nowrap">
+                  {minGuests}-{maxGuests} guests
+                </span>
+                {priceTierNotice && (
+                  <span className="text-xs ml-1 block sm:inline">
+                    ({priceTierNotice})
                   </span>
                 )}
                 {inquiryRequired && (
-                  <span className="text-xs ml-1">(Over max: email)</span>
+                  <span className="text-xs ml-1">(Larger groups welcome - inquire)</span>
                 )}
               </div>
               <div className="text-xl lg:text-2xl font-light text-gray-400 whitespace-nowrap">
