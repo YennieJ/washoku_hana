@@ -147,19 +147,19 @@ export default function BookingDetailModal({
                 {selectedBooking.travel_cost && (
                   <p>
                     <strong>이동 비용:</strong>{' '}
-                    {selectedBooking.travel_cost.toLocaleString()}원
+                    {selectedBooking.travel_cost.toLocaleString()}달러
                   </p>
                 )}
                 {selectedBooking.deposit_amount && (
                   <p>
                     <strong>예약금:</strong>{' '}
-                    {selectedBooking.deposit_amount.toLocaleString()}원
+                    {selectedBooking.deposit_amount.toLocaleString()}달러
                   </p>
                 )}
                 {selectedBooking.total_amount && (
                   <p>
                     <strong>총 금액:</strong>{' '}
-                    {selectedBooking.total_amount.toLocaleString()}원
+                    {selectedBooking.total_amount.toLocaleString()}달러
                   </p>
                 )}
               </div>
