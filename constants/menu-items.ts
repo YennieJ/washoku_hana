@@ -22,21 +22,6 @@ export interface MenuItem {
 
 export const menuItems: MenuItem[] = [
   {
-    id: 1,
-    image: '/Premium Omakase.jpeg',
-    alt: 'Premium Sushi Omakase',
-    title: 'Premium Sushi Omakase',
-    subtitle: 'The True Essence of Sushi.',
-    description: `Experience an authentic Kyoto-style omakase restaurant in the comfort of your home. A 17-course journey begins with refined appetizers and sashimi, followed by perfectly balanced nigiri sushi and a delicate dessert. Every moment is crafted by the hands of a master, bringing the full spirit of traditional Japanese omakase sushi to your table.`,
-    price: 'From $149 per person',
-    minGuests: 4,
-    maxGuests: 20,
-    priceTiers: [
-      { minGuests: 4, maxGuests: 5, price: 180 },
-      { minGuests: 6, maxGuests: 20, price: 149 },
-    ],
-  },
-  {
     id: 2,
     image: '/Kaiseki Kappo Cuisine.jpeg',
     alt: 'Kaiseki Kappo Cuisine',
@@ -49,6 +34,21 @@ export const menuItems: MenuItem[] = [
     priceTiers: [
       { minGuests: 2, maxGuests: 3, price: 289 },
       { minGuests: 4, maxGuests: 8, price: 239 },
+    ],
+  },
+  {
+    id: 1,
+    image: '/Premium Omakase.jpeg',
+    alt: 'Premium Sushi Omakase',
+    title: 'Premium Sushi Omakase',
+    subtitle: 'The True Essence of Sushi.',
+    description: `Experience an authentic Kyoto-style omakase restaurant in the comfort of your home. A 17-course journey begins with refined appetizers and sashimi, followed by perfectly balanced nigiri sushi and a delicate dessert. Every moment is crafted by the hands of a master, bringing the full spirit of traditional Japanese omakase sushi to your table.`,
+    price: 'From $149 per person',
+    minGuests: 4,
+    maxGuests: 20,
+    priceTiers: [
+      { minGuests: 4, maxGuests: 5, price: 180 },
+      { minGuests: 6, maxGuests: 20, price: 149 },
     ],
   },
   {
