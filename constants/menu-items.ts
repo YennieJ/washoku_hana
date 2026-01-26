@@ -47,7 +47,7 @@ export const menuItems: MenuItem[] = [
     minGuests: 4,
     maxGuests: 20,
     priceTiers: [
-      { minGuests: 4, maxGuests: 5, price: 180 },
+      { minGuests: 4, maxGuests: 5, price: 189 },
       { minGuests: 6, maxGuests: 20, price: 149 },
     ],
   },
