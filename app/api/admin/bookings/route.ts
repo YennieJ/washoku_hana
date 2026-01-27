@@ -70,6 +70,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 정렬 적용 (최신순 - 생성일 기준)
+    unreadQuery = unreadQuery.order('created_at', { ascending: false });
+
     const { data: unreadData, error: unreadError } = await unreadQuery;
 
     if (unreadError) {
@@ -91,18 +94,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 정렬 적용 (최신순 - 생성일 기준)
+    readQuery = readQuery.order('created_at', { ascending: false });
+
     const { data: readData, error: readError } = await readQuery;
 
     if (readError) {
       return NextResponse.json({ error: readError.message }, { status: 500 });
     }
 
-    // 3. 합치고 정렬 (최신순)
+    // 3. 합치기 (이미 각 쿼리에서 정렬됨)
+    // 읽지 않은 데이터를 먼저, 그 다음 읽은 데이터
     const allData = [...(unreadData || []), ...(readData || [])];
-    allData.sort(
-      (a, b) =>
-        new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime()
-    );
 
     return NextResponse.json({ data: allData });
   } catch (error: any) {
