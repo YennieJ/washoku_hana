@@ -1,31 +1,31 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { useBookings } from '@/hooks/useBookings';
-import { useMarkAsRead } from '@/hooks/useMarkAsRead';
-import type { Booking } from '@/lib/supabase';
-import { type PeriodType, DEFAULT_PERIOD } from '@/constants/period-filters';
-import { parseBookingDate } from '@/utils/email-utils';
-import { type ReadType, DEFAULT_READ_FILTER } from '@/constants/read-filters';
+"use client";
+import { useState, useEffect } from "react";
+import { useBookings } from "@/hooks/useBookings";
+import { useMarkAsRead } from "@/hooks/useMarkAsRead";
+import type { Booking } from "@/lib/supabase";
+import { type PeriodType, DEFAULT_PERIOD } from "@/constants/period-filters";
+import { parseBookingDate } from "@/utils/email-utils";
+import { type ReadType, DEFAULT_READ_FILTER } from "@/constants/read-filters";
 import {
   type StatusFilterType,
   DEFAULT_STATUS_FILTER,
-} from '@/constants/status-filters';
-import { type ReservationStatus } from '@/constants/reservation-statuses';
-import PeriodFilter from '@/components/admin/period-filter';
-import ReadFilter from '@/components/admin/read-filter';
-import StatusFilter from '@/components/admin/status-filter';
-import SearchInput from '@/components/admin/search-input';
-import BookingTable from '@/components/admin/booking-table';
-import BookingDetailModal from '@/components/admin/booking-detail-modal';
+} from "@/constants/status-filters";
+import { type ReservationStatus } from "@/constants/reservation-statuses";
+import PeriodFilter from "@/components/admin/period-filter";
+import ReadFilter from "@/components/admin/read-filter";
+import StatusFilter from "@/components/admin/status-filter";
+import SearchInput from "@/components/admin/search-input";
+import BookingTable from "@/components/admin/booking-table";
+import BookingDetailModal from "@/components/admin/booking-detail-modal";
 
 export default function AdminDashboard() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [readFilter, setReadFilter] = useState<ReadType>(DEFAULT_READ_FILTER);
   const [statusFilter, setStatusFilter] = useState<StatusFilterType>(
-    DEFAULT_STATUS_FILTER
+    DEFAULT_STATUS_FILTER,
   );
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const markAsReadMutation = useMarkAsRead();
 
   // 검색어 debounce (500ms)
@@ -38,8 +38,8 @@ export default function AdminDashboard() {
 
   // 기간 필터
   const [period, setPeriod] = useState<PeriodType>(DEFAULT_PERIOD);
-  const [customStartDate, setCustomStartDate] = useState<string>('');
-  const [customEndDate, setCustomEndDate] = useState<string>('');
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
   const [periodSearchActive, setPeriodSearchActive] = useState<boolean>(true); // 초기 로드 시 기본 데이터 표시
 
   // React Query로 예약 데이터 가져오기
@@ -56,22 +56,25 @@ export default function AdminDashboard() {
   });
 
   // 상태별 카운트 계산
-  const statusCounts = bookings.reduce((acc, booking) => {
-    acc[booking.status] = (acc[booking.status] || 0) + 1;
-    return acc;
-  }, {} as Record<ReservationStatus, number>);
+  const statusCounts = bookings.reduce(
+    (acc, booking) => {
+      acc[booking.status] = (acc[booking.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<ReservationStatus, number>,
+  );
 
   // 클라이언트 사이드 필터링: 읽음/안읽음 + 상태 필터 (검색/기간은 API에서 처리됨)
   const filteredBookings = bookings.filter((booking) => {
     // 읽음 필터 체크
     const readMatch =
-      readFilter === 'all' ||
-      (readFilter === 'read' && booking.is_read) ||
-      (readFilter === 'unread' && !booking.is_read);
+      readFilter === "all" ||
+      (readFilter === "read" && booking.is_read) ||
+      (readFilter === "unread" && !booking.is_read);
 
     // 상태 필터 체크
     const statusMatch =
-      statusFilter === 'all' || booking.status === statusFilter;
+      statusFilter === "all" || booking.status === statusFilter;
 
     return readMatch && statusMatch;
   });
@@ -81,18 +84,18 @@ export default function AdminDashboard() {
 
   const formatDate = (dateString: string) => {
     const date = parseBookingDate(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatTime = (dateString: string) => {
     const date = parseBookingDate(dateString);
-    return date.toLocaleTimeString('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleTimeString("ko-KR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -116,26 +119,6 @@ export default function AdminDashboard() {
 
           {/* 필터 영역 (컴팩트) */}
           <div className="mb-2 flex flex-col gap-3">
-            {/* 첫 번째 줄: 기간 + 검색 */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
-              <PeriodFilter
-                period={period}
-                setPeriod={setPeriod}
-                customStartDate={customStartDate}
-                setCustomStartDate={setCustomStartDate}
-                customEndDate={customEndDate}
-                setCustomEndDate={setCustomEndDate}
-                periodSearchActive={periodSearchActive}
-                setPeriodSearchActive={setPeriodSearchActive}
-              />
-
-              {/* 검색 */}
-              <SearchInput
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-              />
-            </div>
-
             {/* 두 번째 줄: 읽음 상태 */}
             <ReadFilter
               readFilter={readFilter}
@@ -143,12 +126,29 @@ export default function AdminDashboard() {
               totalCount={totalCount}
               unreadCount={unreadCount}
             />
-
-            {/* 세 번째 줄: 상태 필터 */}
-            <StatusFilter
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-            />
+            {/* 첫 번째 줄: 기간 + 상태 + 검색 */}
+            <div className="flex flex-col items-center justify-between sm:flex-row">
+              <div className="flex flex-row items-center gap-3">
+                <PeriodFilter
+                  period={period}
+                  setPeriod={setPeriod}
+                  customStartDate={customStartDate}
+                  setCustomStartDate={setCustomStartDate}
+                  customEndDate={customEndDate}
+                  setCustomEndDate={setCustomEndDate}
+                  periodSearchActive={periodSearchActive}
+                  setPeriodSearchActive={setPeriodSearchActive}
+                />
+                <StatusFilter
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                />
+              </div>
+              <SearchInput
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+            </div>
           </div>
         </div>
       </div>

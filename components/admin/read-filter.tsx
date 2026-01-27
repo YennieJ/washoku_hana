@@ -15,7 +15,7 @@ export default function ReadFilter({
   unreadCount,
 }: ReadFilterProps) {
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-1 ml-0 lg:ml-2 w-full lg:w-auto">
+    <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-1 w-full lg:w-auto">
       <div className="flex items-center gap-1 flex-wrap">
         {READ_FILTERS.map((filter) => (
           <button

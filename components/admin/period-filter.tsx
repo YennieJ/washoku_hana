@@ -83,8 +83,8 @@ export default function PeriodFilter({
       </button>
 
       {isPeriodOpen && (
-        <div className="absolute z-10 mt-2 w-[320px] rounded-md border border-gray-200 bg-white shadow-lg p-2">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="absolute z-10 mt-2 w-[260px] rounded-md border border-gray-200 bg-white shadow-lg p-1.5">
+          <div className="grid grid-cols-2 gap-1.5">
             {PERIOD_FILTERS.filter((filter) => filter.value !== 'custom').map(
               (filter) => {
                 // 날짜 입력 필드가 열렸을 때는 파란색 표시 안 함
@@ -96,7 +96,7 @@ export default function PeriodFilter({
                 return (
                   <button
                     key={filter.value}
-                    className={`text-left px-3 py-2 rounded hover:bg-gray-50 text-sm ${
+                    className={`text-left px-2 py-1.5 rounded hover:bg-gray-50 text-xs ${
                       isSelected ? 'bg-blue-50 text-blue-700' : 'text-gray-800'
                     }`}
                     onClick={() => handlePeriodChange(filter.value)}
@@ -108,12 +108,12 @@ export default function PeriodFilter({
             )}
           </div>
 
-          <div className="mt-2 border-t border-gray-200 pt-2">
+          <div className="mt-1.5 border-t border-gray-200 pt-1.5">
             {PERIOD_FILTERS.filter((filter) => filter.value === 'custom').map(
               (filter) => (
                 <button
                   key={filter.value}
-                  className={`w-full text-left px-3 py-2 rounded hover:bg-gray-50 text-sm ${
+                  className={`w-full text-left px-2 py-1.5 rounded hover:bg-gray-50 text-xs ${
                     showCustomDateInput || period === 'custom'
                       ? 'bg-blue-50 text-blue-700'
                       : 'text-gray-800'
@@ -127,23 +127,23 @@ export default function PeriodFilter({
 
             {(showCustomDateInput || period === 'custom') && (
               <>
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-1.5 flex items-center gap-1.5">
                   <input
                     type="date"
                     value={customStartDate}
                     onChange={(e) => setCustomStartDate(e.target.value)}
-                    className="px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white text-gray-900 w-[140px]"
+                    className="px-1.5 py-1 border border-gray-200 rounded-md text-xs bg-white text-gray-900 w-[110px]"
                   />
-                  <span className="text-gray-500 text-sm">~</span>
+                  <span className="text-gray-500 text-xs">~</span>
                   <input
                     type="date"
                     value={customEndDate}
                     onChange={(e) => setCustomEndDate(e.target.value)}
-                    className="px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white text-gray-900 w-[140px]"
+                    className="px-1.5 py-1 border border-gray-200 rounded-md text-xs bg-white text-gray-900 w-[110px]"
                   />
                 </div>
 
-                <div className="mt-2 flex justify-end">
+                <div className="mt-1.5 flex justify-end">
                   <button
                     type="button"
                     onClick={() => {
@@ -156,7 +156,7 @@ export default function PeriodFilter({
                       setShowCustomDateInput(false);
                       setIsPeriodOpen(false);
                     }}
-                    className="px-3 py-1.5 rounded-md text-xs bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                    className="px-2 py-1 rounded-md text-xs bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
                     disabled={!customStartDate || !customEndDate}
                   >
                     기간 검색
