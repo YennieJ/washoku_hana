@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase';
+import {
+  createSupabaseServerClient,
+  createSupabaseAdminClient,
+} from '@/lib/supabase';
 import { cookies } from 'next/headers';
 
 interface Params {
@@ -82,6 +85,23 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       updateData.is_read = true;
     }
 
+    // 업데이트 전 기존 예약 정보 조회 (날짜/상태 변경 시 availability 동기화용)
+    let oldBookingDate: string | null = null;
+    let oldStatus: string | null = null;
+
+    if (body.booking_date || body.status) {
+      const { data: existingBooking } = await supabase
+        .from('bookings')
+        .select('booking_date, status')
+        .eq('id', id)
+        .single();
+
+      if (existingBooking) {
+        oldBookingDate = existingBooking.booking_date;
+        oldStatus = existingBooking.status;
+      }
+    }
+
     // 예약 정보 업데이트
     const { data, error } = await supabase
       .from('bookings')
@@ -99,6 +119,45 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         { error: '예약을 찾을 수 없습니다.' },
         { status: 404 }
       );
+    }
+
+    // availability 테이블 자동 동기화
+    if ((body.status || body.booking_date) && data.booking_date) {
+      const adminClient = createSupabaseAdminClient();
+      const activeStatuses = ['AWAITING_DEPOSIT', 'PENDING_UPDATE', 'CONFIRMED'];
+      const newDateStr = data.booking_date.split('T')[0];
+      const oldDateStr = oldBookingDate?.split('T')[0];
+      const wasConfirmed = oldStatus === 'CONFIRMED';
+      const isNowConfirmed = data.status === 'CONFIRMED';
+      const dateChanged = oldDateStr && newDateStr && oldDateStr !== newDateStr;
+
+      // 현재 CONFIRMED → 새 날짜를 closed로
+      if (isNowConfirmed) {
+        await adminClient
+          .from('availability')
+          .upsert(
+            { date: newDateStr, status: 'closed', updated_at: new Date().toISOString() },
+            { onConflict: 'date' }
+          );
+      }
+
+      // 이전에 CONFIRMED였고 (취소되었거나 날짜가 변경된 경우) → 이전 날짜 정리
+      if (wasConfirmed && oldDateStr && (!isNowConfirmed || dateChanged)) {
+        const { data: otherBookings } = await adminClient
+          .from('bookings')
+          .select('id')
+          .gte('booking_date', `${oldDateStr}T00:00:00`)
+          .lte('booking_date', `${oldDateStr}T23:59:59`)
+          .in('status', activeStatuses)
+          .neq('id', id);
+
+        if (!otherBookings || otherBookings.length === 0) {
+          await adminClient
+            .from('availability')
+            .delete()
+            .eq('date', oldDateStr);
+        }
+      }
     }
 
     return NextResponse.json({

@@ -90,11 +90,6 @@ export default function BookingCalendar({
     days.push(day);
   }
 
-  const isWeekend = (day: number): boolean => {
-    const date = new Date(year, month, day);
-    return date.getDay() === 0 || date.getDay() === 6; // Sunday or Saturday
-  };
-
   const isPastDate = (day: number) => {
     const date = new Date(year, month, day);
     // Reservation available only 8 days from today (7 days after today)
@@ -195,7 +190,6 @@ export default function BookingCalendar({
             return <div key={index} className="h-12"></div>;
           }
 
-          const isWeekendDay = isWeekend(day);
           const isPastDay = isPastDate(day);
           const isUnavailableDay = isUnavailable(day);
           const isSelectedDay = isSelected(day);

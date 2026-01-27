@@ -15,13 +15,23 @@ export async function GET(request: NextRequest) {
     ];
 
     // 해당 상태의 예약들 조회
-    const { data: bookings, error } = await supabase
+    const { data: bookings, error: bookingsError } = await supabase
       .from('bookings')
       .select('booking_date')
       .in('status', unavailableStatuses);
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (bookingsError) {
+      return NextResponse.json({ error: bookingsError.message }, { status: 500 });
+    }
+
+    // availability 테이블에서 closed 날짜 조회
+    const { data: closedDates, error: availabilityError } = await supabase
+      .from('availability')
+      .select('date')
+      .eq('status', 'closed');
+
+    if (availabilityError) {
+      return NextResponse.json({ error: availabilityError.message }, { status: 500 });
     }
 
     // 날짜만 추출 (YYYY-MM-DD 형식)
@@ -33,6 +43,13 @@ export async function GET(request: NextRequest) {
         // 타임존 변환 없이 문자열에서 직접 날짜 추출
         const dateStr = booking.booking_date.split('T')[0];
         unavailableDates.add(dateStr);
+      });
+    }
+
+    // availability 테이블에서 closed 날짜 추가
+    if (closedDates) {
+      closedDates.forEach((row) => {
+        unavailableDates.add(row.date);
       });
     }
 

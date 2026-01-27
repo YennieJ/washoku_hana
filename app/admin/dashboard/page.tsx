@@ -17,6 +17,7 @@ import StatusFilter from "@/components/admin/status-filter";
 import SearchInput from "@/components/admin/search-input";
 import BookingTable from "@/components/admin/booking-table";
 import BookingDetailModal from "@/components/admin/booking-detail-modal";
+import SidebarNav from "@/components/admin/sidebar-nav";
 
 export default function AdminDashboard() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -110,14 +111,21 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="px-3 lg:px-6 py-3 lg:py-4">
-          <h1 className="text-lg lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3 lg:mb-4">
-            Washoku Hana - 예약 관리
-          </h1>
+      {/* 왼쪽 네비게이션 바 */}
+      <SidebarNav />
 
-          {/* 필터 영역 (컴팩트) */}
+      {/* 메인 컨텐츠 영역 (네비게이션 바 공간 확보) */}
+      <div className="ml-16 flex-1 flex flex-col">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="px-3 lg:px-6 py-3 lg:py-4">
+            <div className="flex items-center justify-between mb-3 lg:mb-4">
+              <h1 className="text-lg lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Washoku Hana - 예약 관리
+              </h1>
+            </div>
+
+          {/* 필터 영역 */}
           <div className="mb-2 flex flex-col gap-3">
             {/* 두 번째 줄: 읽음 상태 */}
             <ReadFilter
@@ -186,15 +194,16 @@ export default function AdminDashboard() {
             />
           )}
         </div>
-      </main>
+        </main>
 
-      {/* 상세 모달 */}
-      {selectedBooking && (
-        <BookingDetailModal
-          selectedBooking={selectedBooking}
-          setSelectedBooking={setSelectedBooking}
-        />
-      )}
+        {/* 상세 모달 */}
+        {selectedBooking && (
+          <BookingDetailModal
+            selectedBooking={selectedBooking}
+            setSelectedBooking={setSelectedBooking}
+          />
+        )}
+      </div>
     </div>
   );
 }
