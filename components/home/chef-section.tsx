@@ -25,7 +25,7 @@ export default function ChefSection() {
           <div className="px-6">
             <div className="relative aspect-[4/5] overflow-hidden">
               <Image
-                src="/minho.jpg"
+                src="/minho.PNG"
                 alt="Chef Minho"
                 fill
                 className="object-cover"
@@ -42,7 +42,7 @@ export default function ChefSection() {
           <div className="relative overflow-hidden lg:pl-12 xl:pl-16">
             <div className="relative h-full">
               <Image
-                src="/minho.jpg"
+                src="/minho.PNG"
                 alt="Chef Minho"
                 fill
                 className="object-cover"

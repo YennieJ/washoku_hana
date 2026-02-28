@@ -33,8 +33,8 @@ export default function AboutMenuSection() {
           </div>
           <div className="relative w-64 h-40">
             <Image
-              src="/Honmaguro.jpeg"
-              alt="Honmaguro"
+              src="/truffle.jpeg"
+              alt="Truffle"
               fill
               className="object-cover rounded"
             />
